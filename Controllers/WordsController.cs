@@ -1,0 +1,100 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WordOfTheDay.Models;
+
+namespace WordOfTheDay.Controllers
+{
+    [Route("api/Words")]
+    [ApiController]
+    public class WordsController : ControllerBase
+    {
+        private readonly WordContext _context;
+
+        public WordsController(WordContext context)
+        {
+            _context = context;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Word>>> GetWords()
+        {
+            return await _context.Words.ToListAsync();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Word>> GetWord(Guid id)
+        {
+            var word = await _context.Words.FindAsync(id);
+
+            if (word == null)
+            {
+                return NotFound();
+            }
+
+            return word;
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutWord(Guid id, Word word)
+        {
+            if (id != word.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(word).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!WordExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<Word>> PostWord(Word word)
+        {
+            _context.Words.Add(word);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetWord), new { id = word.Id }, word);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteWord(Guid id)
+        {
+            var word = await _context.Words.FindAsync(id);
+            if (word == null)
+            {
+                return NotFound();
+            }
+
+            _context.Words.Remove(word);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        private bool WordExists(Guid id)
+        {
+            return _context.Words.Any(e => e.Id == id);
+        }
+    }
+}
