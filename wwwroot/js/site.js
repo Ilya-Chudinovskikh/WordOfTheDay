@@ -10,7 +10,7 @@ function getWords() {
 
 function addWord() {
     const addTextTextbox = document.getElementById('add-word');
-
+    const addEmailTextbox = document.getElementById('add-email');
     const word = {
         email: addEmailTextbox.value.trim(),
         text: addTextTextbox.value.trim()
