@@ -9,10 +9,11 @@ function getWords() {
 }
 
 function addWord() {
-    const addWordTextbox = document.getElementById('add-word');
+    const addTextTextbox = document.getElementById('add-word');
 
     const word = {
-        word: addWordTextbox.value.trim()
+        email: addEmailTextbox.value.trim(),
+        text: addTextTextbox.value.trim()
     };
 
     fetch(uri, {
@@ -26,7 +27,8 @@ function addWord() {
         .then(response => response.json())
         .then(() => {
             getWords();
-            addWordTextbox.value = '';
+            addEmailTextbox.value = '';
+            addTextTextbox.value = '';
         })
         .catch(error => console.error('Unable to add your word.', error));
 }
