@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WordOfTheDay.Models;
+using System.Threading;
 
 namespace WordOfTheDay.Controllers
 {
@@ -21,13 +22,14 @@ namespace WordOfTheDay.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Word>>> GetWords()
+        public async Task<IActionResult> GetWords(CancellationToken cancellationToken)
         {
-            return await _context.Words.ToListAsync();
+            var words = await _context.Words.ToListAsync(cancellationToken);
+            return Ok(words);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Word>> GetWord(Guid id)
+        public async Task<IActionResult> GetWord(Guid id)
         {
             var word = await _context.Words.FindAsync(id);
 
@@ -36,7 +38,7 @@ namespace WordOfTheDay.Controllers
                 return NotFound();
             }
 
-            return word;
+            return Ok(word);
         }
 
         [HttpPut("{id}")]
@@ -69,12 +71,23 @@ namespace WordOfTheDay.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Word>> PostWord(Word word)
+        public async Task<IActionResult> PostWord(Word word)
         {
+            if (word == null)
+            {
+                return BadRequest();
+            }
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (_context.Words.Any(w => w.Email == word.Email))
+                return BadRequest(ModelState);
+
             _context.Words.Add(word);
             await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetWord), new { id = word.Id }, word);
+            //return CreatedAtAction(nameof(GetWord), new { id = word.Id }, word);
+            return Ok(word);
         }
 
         [HttpDelete("{id}")]

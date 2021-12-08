@@ -1,5 +1,5 @@
 ﻿const uri = 'api/words'
-let words [];
+let words = [];
 
 function getWords() {
     fetch(uri)
@@ -12,7 +12,7 @@ function addWord() {
     const addTextTextbox = document.getElementById('add-word');
     const addEmailTextbox = document.getElementById('add-email');
     const word = {
-        email: addEmailTextbox.value.trim(),
+        email: addEmailTextbox.value.trim(),//добавить проверку на емайл и слово макс 50 символов
         text: addTextTextbox.value.trim()
     };
 
