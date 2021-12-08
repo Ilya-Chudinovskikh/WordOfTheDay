@@ -22,7 +22,7 @@ namespace WordOfTheDay
 
             services.AddControllers();
             services.AddDbContext<WordContext>(options =>
-                options.UseInMemoryDatabase("WordOfTheDay"));
+                options.UseSqlServer(Configuration.GetConnectionString("WordContext")));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
