@@ -8,6 +8,13 @@ function getWords() {
         .catch(error => console.error('Unable to show words.', error));
 }
 
+function getWordOfTheDay() {
+    fetch(uri)
+        .then(response => response.json())
+        .then(data => _displayWordOfTheDay(data))
+        .catch(error => console.error('Unable to show words.', error));
+}
+
 function addWord() {
     const addTextTextbox = document.getElementById('add-word');
     const addEmailTextbox = document.getElementById('add-email');
@@ -51,6 +58,24 @@ function _displayWords(data) {
         td2.appendChild(textNode);
 
     });
+
+    words = data;
+}
+
+function _displayWordOfTheDay(data) {
+
+    //import Enumerable from './linq.min.js'
+
+    const tBody = document.getElementById('words');
+    tBody.innerHTML = '';
+
+    let mostFrequent = Enumerable.from(data).groupBy(w => w.Text).orderByDescending(w => w.count()).first();
+
+    let tr = tBody.insertRow();
+
+    let td1 = tr.insertCell(0);
+    let textNode = document.createTextNode(mostFrequent.text);
+    td1.appendChild(textNode);
 
     words = data;
 }

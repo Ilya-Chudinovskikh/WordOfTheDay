@@ -86,7 +86,7 @@ namespace WordOfTheDay.Controllers
 
             _context.Words.Add(word);
             await _context.SaveChangesAsync();
-            //return CreatedAtAction(nameof(GetWord), new { id = word.Id }, word);
+
             return Ok(word);
         }
 
