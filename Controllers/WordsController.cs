@@ -22,9 +22,9 @@ namespace WordOfTheDay.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetWords(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetWords()
         {
-            var words = await _context.Words.ToListAsync(cancellationToken);
+            var words = await _context.Words.ToListAsync();
             return Ok(words);
         }
 
