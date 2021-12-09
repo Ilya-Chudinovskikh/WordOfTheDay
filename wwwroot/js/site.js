@@ -69,13 +69,18 @@ function _displayWordOfTheDay(data) {
     const tBody = document.getElementById('words');
     tBody.innerHTML = '';
 
-    let mostFrequent = Enumerable.from(data).groupBy(w => w.Text).orderByDescending(w => w.count()).first();
+    let wordOfTheDay = Enumerable.from(data).groupBy(w => w.Text).orderByDescending(w => w.count()).first();
+    let number = Enumerable.from(data).count(w => w.Text == wordOfTheDay.Text);
 
     let tr = tBody.insertRow();
 
     let td1 = tr.insertCell(0);
-    let textNode = document.createTextNode(mostFrequent.text);
-    td1.appendChild(textNode);
+    let wordNode = document.createTextNode(wordOfTheDay.text);
+    td1.appendChild(wordNode);
+
+    let td2 = tr.insertCell(1);
+    let numberNode = document.createTextNode(number);
+    td2.appendChild(numberNode);
 
     words = data;
 }
