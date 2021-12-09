@@ -28,10 +28,10 @@ namespace WordOfTheDay.Controllers
             return Ok(words);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetWord(Guid id)
+        [HttpGet("{wordId}")]
+        public async Task<IActionResult> GetWord(Guid wordId)
         {
-            var word = await _context.Words.FindAsync(id);
+            var word = await _context.Words.FindAsync(wordId);
 
             if (word == null)
             {
