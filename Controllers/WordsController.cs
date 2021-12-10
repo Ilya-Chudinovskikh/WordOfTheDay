@@ -41,38 +41,12 @@ namespace WordOfTheDay.Controllers
             return Ok(word);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutWord(Guid id, Word word)
-        {
-            if (id != word.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(word).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!WordExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
 
         [HttpPost]
         public async Task<IActionResult> PostWord(Word word)
         {
+            word.AddTime = DateTime.Now;
+
             if (word == null)
             {
                 return BadRequest();
@@ -88,26 +62,6 @@ namespace WordOfTheDay.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(word);
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteWord(Guid id)
-        {
-            var word = await _context.Words.FindAsync(id);
-            if (word == null)
-            {
-                return NotFound();
-            }
-
-            _context.Words.Remove(word);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool WordExists(Guid id)
-        {
-            return _context.Words.Any(e => e.Id == id);
         }
     }
 }

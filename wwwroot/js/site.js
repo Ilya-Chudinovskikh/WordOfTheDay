@@ -8,13 +8,6 @@ function getWords() {
         .catch(error => console.error('Unable to show words.', error));
 }
 
-function getWordOfTheDay() {
-    fetch(uri)
-        .then(response => response.json())
-        .then(data => _displayWordOfTheDay(data))
-        .catch(error => console.error('Unable to show words.', error));
-}
-
 function addWord() {
     const addTextTextbox = document.getElementById('add-word');
     const addEmailTextbox = document.getElementById('add-email');
@@ -57,30 +50,11 @@ function _displayWords(data) {
         let textNode = document.createTextNode(word.text);
         td2.appendChild(textNode);
 
+        let td3 = tr.insertCell(2);
+        let timeNode = document.createTextNode(word.AddTime);
+        td3.appendChild(timeNode.toString());
+
     });
-
-    words = data;
-}
-
-function _displayWordOfTheDay(data) {
-
-    //import Enumerable from './linq.min.js'
-
-    const tBody = document.getElementById('words');
-    tBody.innerHTML = '';
-
-    let wordOfTheDay = Enumerable.from(data).groupBy(w => w.Text).orderByDescending(w => w.count()).first();
-    let number = Enumerable.from(data).count(w => w.Text == wordOfTheDay.Text);
-
-    let tr = tBody.insertRow();
-
-    let td1 = tr.insertCell(0);
-    let wordNode = document.createTextNode(wordOfTheDay.text);
-    td1.appendChild(wordNode);
-
-    let td2 = tr.insertCell(1);
-    let numberNode = document.createTextNode(number);
-    td2.appendChild(numberNode);
 
     words = data;
 }

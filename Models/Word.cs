@@ -12,5 +12,7 @@ namespace WordOfTheDay.Models
         [Required]
         [StringLength(50)]
         public string Text { get; set; }
+        [Required]
+        public DateTime AddTime { get; set; }
     }
 }
