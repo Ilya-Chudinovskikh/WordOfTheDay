@@ -12,7 +12,6 @@ namespace WordOfTheDay.Migrations
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
-#pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.12")
@@ -40,7 +39,6 @@ namespace WordOfTheDay.Migrations
 
                     b.ToTable("Words");
                 });
-#pragma warning restore 612, 618
         }
     }
 }

@@ -50,10 +50,6 @@ function _displayWords(data) {
         let textNode = document.createTextNode(word.text);
         td2.appendChild(textNode);
 
-        let td3 = tr.insertCell(2);
-        let timeNode = document.createTextNode(word.AddTime);
-        td3.appendChild(timeNode.toString());
-
     });
 
     words = data;

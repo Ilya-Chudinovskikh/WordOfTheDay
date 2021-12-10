@@ -52,10 +52,10 @@ namespace WordOfTheDay.Controllers
                 return BadRequest();
             }
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             if (_context.Words.Any(w => w.Email == word.Email))
+                ModelState.AddModelError("Email", "Users with the same email address can add only one word per day!");
+
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             _context.Words.Add(word);
