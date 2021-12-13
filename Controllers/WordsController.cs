@@ -25,6 +25,7 @@ namespace WordOfTheDay.Controllers
         public async Task<IActionResult> GetWords()
         {
             var words = await AllWords();
+
             return Ok(words);
         }
 
@@ -44,7 +45,7 @@ namespace WordOfTheDay.Controllers
         [HttpGet("get-word-of-the-day")]
         public async Task<IActionResult> GetWordOfTheDay()
         {
-            var wordOfTheDay = await GetWotd();
+            var wordOfTheDay = await WordOfTheDay();
 
             if (wordOfTheDay == null)
             {
@@ -54,11 +55,12 @@ namespace WordOfTheDay.Controllers
             return Ok(wordOfTheDay);
         }
 
-        [HttpGet("get-amount-wotd")]
+        [HttpGet("get-amount-word-of-the-day")]
         public async Task<IActionResult> GetAmountWotd()
         {
-            var wotd = await GetWotd();
-            var amount = AllWords().Result.Where(w => w.Text == wotd).Count();
+            var wotd = await WordOfTheDay();
+            var words = await AllWords();
+            var amount = words.Where(w => w.Text == wotd).Count();
 
             if (amount < 1)
             {
@@ -72,7 +74,14 @@ namespace WordOfTheDay.Controllers
         public async Task<IActionResult> GetAmount(Guid id)
         {
             var word = await GetWordById(id);
-            var amount = AllWords().Result.Where(w => w.Text == word.Text).Count();
+
+            if (word == null)
+            {
+                return NotFound();
+            }
+
+            var words = await AllWords();
+            var amount = words.Where(w => w.Text == word.Text).Count();
 
             if(amount < 1)
             {
@@ -86,34 +95,17 @@ namespace WordOfTheDay.Controllers
         public async Task<IActionResult> ClosestWords(Guid id)
         {
             var word = await GetWordById(id);
-            var closestWords = AllWords().Result.Where(w => IsClose(word.Text, w.Text))
-                .Select(word => word.Text == word.Text + " - " + GetAmount(word.Id).ToString())/*.Select(word => word.Text)*/.Distinct();
 
-            if (closestWords == null)
+            if (word == null)
             {
-                return Ok();
+                return NotFound();
             }
+
+            var words = await AllWords();
+            var closestWords = words.Where(w => IsClose(word.Text, w.Text))
+                .Select(w => w.Text).Distinct();
 
             return Ok(closestWords);
-            
-            static bool IsClose (string word, string compare)
-            {
-                word = word.ToLower(); compare = compare.ToLower();
-                if (word == compare) return false;
-                int error = 0, wlen = word.Length, clen = compare.Length, delta = wlen - clen;
-                if (Math.Abs(delta) > 1) return false;
-                for (int i = 0, j = 0; i < Math.Min(wlen, clen); i++, j++)
-                {
-                    if (word[i] != compare[j])
-                    {
-                        error++;
-                        if (error > 1) return false;
-                        if (delta > 0) j--;
-                        if (delta < 0) i--;
-                    }
-                }
-                return true;
-            }
         }
 
         [HttpPost]
@@ -141,6 +133,7 @@ namespace WordOfTheDay.Controllers
         public async Task<List<Word>> AllWords()
         {
             var allWords = await _context.Words.ToListAsync();
+
             return allWords;
         }
 
@@ -148,20 +141,34 @@ namespace WordOfTheDay.Controllers
         {
             var word = await _context.Words.FindAsync(id);
 
-            if (word == null)
-            {
-                throw new NullReferenceException();
-            }
-
             return word;
         }
 
-        public async Task<String> GetWotd()
+        public async Task<String> WordOfTheDay()
         {
             var words = await AllWords();
             var wordOfTheDay = words.GroupBy(word => word.Text).OrderByDescending(el => el.Count()).First().Key;
 
             return wordOfTheDay;
+        }
+        private static bool IsClose(string word, string compare)
+        {
+            word = word.ToLower();
+            compare = compare.ToLower();
+            if (word == compare) return false;
+            int error = 0, wlen = word.Length, clen = compare.Length, delta = wlen - clen;
+            if (Math.Abs(delta) > 1) return false;
+            for (int i = 0, j = 0; i < Math.Min(wlen, clen); i++, j++)
+            {
+                if (word[i] != compare[j])
+                {
+                    error++;
+                    if (error > 1) return false;
+                    if (delta > 0) j--;
+                    if (delta < 0) i--;
+                }
+            }
+            return true;
         }
     }
 }
