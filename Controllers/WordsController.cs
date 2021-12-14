@@ -10,7 +10,7 @@ using System.Threading;
 
 namespace WordOfTheDay.Controllers
 {
-    [Route("api/Words")]
+    [Route("api/words")]
     [ApiController]
     public class WordsController : ControllerBase
     {
@@ -24,14 +24,15 @@ namespace WordOfTheDay.Controllers
         [HttpGet]
         public async Task<IActionResult> GetWords()
         {
-            var words = await _context.Words.ToListAsync();
+            var words = await AllWords();
+
             return Ok(words);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetWord(Guid id)
         {
-            var word = await _context.Words.FindAsync(id);
+            var word = await GetWordById(id);
 
             if (word == null)
             {
@@ -41,6 +42,71 @@ namespace WordOfTheDay.Controllers
             return Ok(word);
         }
 
+        [HttpGet("get-word-of-the-day")]
+        public async Task<IActionResult> GetWordOfTheDay()
+        {
+            var wordOfTheDay = await WordOfTheDay();
+
+            if (wordOfTheDay == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(wordOfTheDay);
+        }
+
+        [HttpGet("get-amount-word-of-the-day")]
+        public async Task<IActionResult> GetAmountWotd()
+        {
+            var wotd = await WordOfTheDay();
+            var words = await AllWords();
+            var amount = words.Where(w => w.Text == wotd).Count();
+
+            if (amount < 1)
+            {
+                return NotFound();
+            }
+
+            return Ok(amount);
+        }
+
+        [HttpGet("get-amount/{id}")]
+        public async Task<IActionResult> GetAmount(Guid id)
+        {
+            var word = await GetWordById(id);
+
+            if (word == null)
+            {
+                return NotFound();
+            }
+
+            var words = await AllWords();
+            var amount = words.Where(w => w.Text == word.Text).Count();
+
+            if(amount < 1)
+            {
+                return NotFound();
+            }
+
+            return Ok(amount);
+        }
+
+        [HttpGet("get-closest-words/{id}")]
+        public async Task<IActionResult> ClosestWords(Guid id)
+        {
+            var word = await GetWordById(id);
+
+            if (word == null)
+            {
+                return NotFound();
+            }
+
+            var words = await AllWords();
+            var closestWords = words.Where(w => IsClose(word.Text, w.Text))
+                .Select(w => w.Text).Distinct();
+
+            return Ok(closestWords);
+        }
 
         [HttpPost]
         public async Task<IActionResult> PostWord(Word word)
@@ -62,6 +128,47 @@ namespace WordOfTheDay.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(word);
+        }
+
+        public async Task<List<Word>> AllWords()
+        {
+            var allWords = await _context.Words.ToListAsync();
+
+            return allWords;
+        }
+
+        public async Task<Word> GetWordById(Guid id)
+        {
+            var word = await _context.Words.FindAsync(id);
+
+            return word;
+        }
+
+        public async Task<String> WordOfTheDay()
+        {
+            var words = await AllWords();
+            var wordOfTheDay = words.GroupBy(word => word.Text).OrderByDescending(el => el.Count()).First().Key;
+
+            return wordOfTheDay;
+        }
+        private static bool IsClose(string word, string compare)
+        {
+            word = word.ToLower();
+            compare = compare.ToLower();
+            if (word == compare) return false;
+            int error = 0, wlen = word.Length, clen = compare.Length, delta = wlen - clen;
+            if (Math.Abs(delta) > 1) return false;
+            for (int i = 0, j = 0; i < Math.Min(wlen, clen); i++, j++)
+            {
+                if (word[i] != compare[j])
+                {
+                    error++;
+                    if (error > 1) return false;
+                    if (delta > 0) j--;
+                    if (delta < 0) i--;
+                }
+            }
+            return true;
         }
     }
 }
