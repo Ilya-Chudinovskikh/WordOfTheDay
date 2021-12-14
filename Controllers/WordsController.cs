@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using WordOfTheDay.Models;
+using WordOfTheDay.Entities;
 using System.Threading;
+using Business_logic;
 
 namespace WordOfTheDay.Controllers
 {
@@ -15,7 +16,6 @@ namespace WordOfTheDay.Controllers
     public class WordsController : ControllerBase
     {
         private readonly WordContext _context;
-
         public WordsController(WordContext context)
         {
             _context = context;
@@ -24,7 +24,7 @@ namespace WordOfTheDay.Controllers
         [HttpGet]
         public async Task<IActionResult> GetWords()
         {
-            var words = await AllWords();
+            var words = await WordBL.GetWords(_context);
 
             return Ok(words);
         }
@@ -32,7 +32,7 @@ namespace WordOfTheDay.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetWord(Guid id)
         {
-            var word = await GetWordById(id);
+            var word = await WordBL.GetWord(id, _context);
 
             if (word == null)
             {
@@ -45,7 +45,7 @@ namespace WordOfTheDay.Controllers
         [HttpGet("get-word-of-the-day")]
         public async Task<IActionResult> GetWordOfTheDay()
         {
-            var wordOfTheDay = await WordOfTheDay();
+            var wordOfTheDay = await WordBL.WordOfTheDay(_context);
 
             if (wordOfTheDay == null)
             {
@@ -58,9 +58,7 @@ namespace WordOfTheDay.Controllers
         [HttpGet("get-amount-word-of-the-day")]
         public async Task<IActionResult> GetAmountWotd()
         {
-            var wotd = await WordOfTheDay();
-            var words = await AllWords();
-            var amount = words.Where(w => w.Text == wotd).Count();
+            long amount = await WordBL.GetAmountWotd(_context);
 
             if (amount < 1)
             {
@@ -73,15 +71,7 @@ namespace WordOfTheDay.Controllers
         [HttpGet("get-amount/{id}")]
         public async Task<IActionResult> GetAmount(Guid id)
         {
-            var word = await GetWordById(id);
-
-            if (word == null)
-            {
-                return NotFound();
-            }
-
-            var words = await AllWords();
-            var amount = words.Where(w => w.Text == word.Text).Count();
+            var amount = await WordBL.GetAmount(id, _context);
 
             if(amount < 1)
             {
@@ -94,16 +84,7 @@ namespace WordOfTheDay.Controllers
         [HttpGet("get-closest-words/{id}")]
         public async Task<IActionResult> ClosestWords(Guid id)
         {
-            var word = await GetWordById(id);
-
-            if (word == null)
-            {
-                return NotFound();
-            }
-
-            var words = await AllWords();
-            var closestWords = words.Where(w => IsClose(word.Text, w.Text))
-                .Select(w => w.Text).Distinct();
+            var closestWords = await WordBL.ClosestWords(id, _context);
 
             return Ok(closestWords);
         }
@@ -111,64 +92,21 @@ namespace WordOfTheDay.Controllers
         [HttpPost]
         public async Task<IActionResult> PostWord(Word word)
         {
-            word.AddTime = DateTime.Now;
 
             if (word == null)
             {
                 return BadRequest();
             }
 
-            if (_context.Words.Any(w => w.Email == word.Email))
+            if (await WordBL.AlreadyExist(word, _context))
                 ModelState.AddModelError("Email", "Users with the same email address can add only one word per day!");
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            _context.Words.Add(word);
-            await _context.SaveChangesAsync();
+            await WordBL.PostWord(word, _context);
 
             return Ok(word);
-        }
-
-        public async Task<List<Word>> AllWords()
-        {
-            var allWords = await _context.Words.ToListAsync();
-
-            return allWords;
-        }
-
-        public async Task<Word> GetWordById(Guid id)
-        {
-            var word = await _context.Words.FindAsync(id);
-
-            return word;
-        }
-
-        public async Task<String> WordOfTheDay()
-        {
-            var words = await AllWords();
-            var wordOfTheDay = words.GroupBy(word => word.Text).OrderByDescending(el => el.Count()).First().Key;
-
-            return wordOfTheDay;
-        }
-        private static bool IsClose(string word, string compare)
-        {
-            word = word.ToLower();
-            compare = compare.ToLower();
-            if (word == compare) return false;
-            int error = 0, wlen = word.Length, clen = compare.Length, delta = wlen - clen;
-            if (Math.Abs(delta) > 1) return false;
-            for (int i = 0, j = 0; i < Math.Min(wlen, clen); i++, j++)
-            {
-                if (word[i] != compare[j])
-                {
-                    error++;
-                    if (error > 1) return false;
-                    if (delta > 0) j--;
-                    if (delta < 0) i--;
-                }
-            }
-            return true;
         }
     }
 }
