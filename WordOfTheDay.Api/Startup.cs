@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
-using WordOfTheDay.Models;
+using WordOfTheDay.Entities;
 
 namespace WordOfTheDay
 {

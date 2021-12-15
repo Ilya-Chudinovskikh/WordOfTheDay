@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 
-namespace WordOfTheDay.Models
+namespace WordOfTheDay.Entities
 {
     public class WordContext : DbContext
     {

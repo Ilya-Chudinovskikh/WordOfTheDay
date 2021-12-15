@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace WordOfTheDay.Models
+namespace WordOfTheDay.Entities
 {
     public class Word
     {
