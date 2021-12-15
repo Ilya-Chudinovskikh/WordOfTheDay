@@ -8,9 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using WordOfTheDay.Entities;
 using System.Threading;
 
-namespace Data_access
+namespace WordOfTheDay.Repository
 {
-    public static class WordDA
+    public static class WordsRepository
     {
         public static async Task<List<Word>> AllWords(WordContext _context)
         {

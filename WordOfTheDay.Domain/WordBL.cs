@@ -7,27 +7,27 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WordOfTheDay.Entities;
 using System.Threading;
-using Data_access;
+using WordOfTheDay.Repository;
 
-namespace Business_logic
+namespace WordOfTheDay.Domain
 {
-    public static class WordBL
+    public static class WordsServices
     {
         public static async Task<List<Word>> GetWords(WordContext _context)
         {
-            var words = await WordDA.AllWords(_context);
+            var words = await WordsRepository.AllWords(_context);
 
             return words;
         }
         public static async Task<Word> GetWord(Guid id, WordContext _context)
         {
-            var word = await WordDA.GetWordById(id, _context);
+            var word = await WordsRepository.GetWordById(id, _context);
 
             return word;
         }
         public static async Task<string> WordOfTheDay(WordContext _context)
         {
-            var words = await WordDA.AllWords(_context);
+            var words = await WordsRepository.AllWords(_context);
             var wordOfTheDay = words.GroupBy(word => word.Text).OrderByDescending(el => el.Count()).First().Key;
 
             return wordOfTheDay;
@@ -35,7 +35,7 @@ namespace Business_logic
         public static async Task<long> GetAmountWordOfTheDay(WordContext _context)
         {
             var wordOfTheDay = await WordOfTheDay(_context);
-            var words = await WordDA.AllWords(_context);
+            var words = await WordsRepository.AllWords(_context);
 
             long amount = words.Where(w => w.Text == wordOfTheDay).Count();
 
@@ -43,17 +43,17 @@ namespace Business_logic
         }
         public static async Task<long> GetAmount(Guid id, WordContext _context)
         {
-            var word = await WordDA.GetWordById(id, _context);
+            var word = await WordsRepository.GetWordById(id, _context);
 
-            var words = await WordDA.AllWords(_context);
+            var words = await WordsRepository.AllWords(_context);
             long amount = words.Where(w => w.Text == word.Text).Count();
 
             return amount;
         }
         public static async Task<IEnumerable<string>> ClosestWords(Guid id, WordContext _context)
         {
-            var word = await WordDA.GetWordById(id, _context);
-            var words = await WordDA.AllWords(_context);
+            var word = await WordsRepository.GetWordById(id, _context);
+            var words = await WordsRepository.AllWords(_context);
 
             var closestWords = words.Where(w => IsClose(word.Text, w.Text))
                 .Select(w => w.Text).Distinct();
@@ -64,13 +64,13 @@ namespace Business_logic
         {
             word.AddTime = DateTime.Now;
 
-            await WordDA.PostWord(word, _context);
+            await WordsRepository.PostWord(word, _context);
 
             return word;
         }
         public static async Task<bool> AlreadyExist(Word word, WordContext _context)
         {
-            var words = await WordDA.AllWords(_context);
+            var words = await WordsRepository.AllWords(_context);
             bool exist = words.Any(w => w.Email == word.Email);
 
             return exist;

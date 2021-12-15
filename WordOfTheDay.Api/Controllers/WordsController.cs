@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WordOfTheDay.Entities;
 using System.Threading;
-using Business_logic;
+using WordOfTheDay.Domain;
 
 namespace WordOfTheDay.Controllers
 {
@@ -24,7 +24,7 @@ namespace WordOfTheDay.Controllers
         [HttpGet]
         public async Task<IActionResult> GetWords()
         {
-            var words = await WordBL.GetWords(_context);
+            var words = await WordsServices.GetWords(_context);
 
             return Ok(words);
         }
@@ -32,7 +32,7 @@ namespace WordOfTheDay.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetWord(Guid id)
         {
-            var word = await WordBL.GetWord(id, _context);
+            var word = await WordsServices.GetWord(id, _context);
 
             if (word == null)
             {
@@ -45,7 +45,7 @@ namespace WordOfTheDay.Controllers
         [HttpGet("get-word-of-the-day")]
         public async Task<IActionResult> GetWordOfTheDay()
         {
-            var wordOfTheDay = await WordBL.WordOfTheDay(_context);
+            var wordOfTheDay = await WordsServices.WordOfTheDay(_context);
 
             if (wordOfTheDay == null)
             {
@@ -58,7 +58,7 @@ namespace WordOfTheDay.Controllers
         [HttpGet("get-amount-word-of-the-day")]
         public async Task<IActionResult> GetAmountWordOfTheDay()
         {
-            long amount = await WordBL.GetAmountWordOfTheDay(_context);
+            long amount = await WordsServices.GetAmountWordOfTheDay(_context);
 
             if (amount < 1)
             {
@@ -71,7 +71,7 @@ namespace WordOfTheDay.Controllers
         [HttpGet("get-amount/{id}")]
         public async Task<IActionResult> GetAmount(Guid id)
         {
-            var amount = await WordBL.GetAmount(id, _context);
+            var amount = await WordsServices.GetAmount(id, _context);
 
             if(amount < 1)
             {
@@ -84,7 +84,7 @@ namespace WordOfTheDay.Controllers
         [HttpGet("get-closest-words/{id}")]
         public async Task<IActionResult> ClosestWords(Guid id)
         {
-            var closestWords = await WordBL.ClosestWords(id, _context);
+            var closestWords = await WordsServices.ClosestWords(id, _context);
 
             return Ok(closestWords);
         }
@@ -98,13 +98,13 @@ namespace WordOfTheDay.Controllers
                 return BadRequest();
             }
 
-            if (await WordBL.AlreadyExist(word, _context))
+            if (await WordsServices.AlreadyExist(word, _context))
                 ModelState.AddModelError("Email", "Users with the same email address can add only one word per day!");
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            await WordBL.PostWord(word, _context);
+            await WordsServices.PostWord(word, _context);
 
             return Ok(word);
         }
