@@ -56,9 +56,9 @@ namespace WordOfTheDay.Controllers
         }
 
         [HttpGet("get-amount-word-of-the-day")]
-        public async Task<IActionResult> GetAmountWotd()
+        public async Task<IActionResult> GetAmountWordOfTheDay()
         {
-            long amount = await WordBL.GetAmountWotd(_context);
+            long amount = await WordBL.GetAmountWordOfTheDay(_context);
 
             if (amount < 1)
             {
