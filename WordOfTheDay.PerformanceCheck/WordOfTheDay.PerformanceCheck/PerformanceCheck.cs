@@ -2,19 +2,20 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Net;
 using System.Threading.Tasks;
+using System.Text.Json;
+using System.Net.Http;
+using System.Net.Http.Json;
+using WordOfTheDay.Entities;
 
-namespace WordOfTheDay.PerformanceCheck
+namespace PerformanceCheck
 {
     class PerformanceCheck
     {
-        static void Main()
+        static async Task Main()
         {
             Request request = new(1, @"C:\Users\Илья\OneDrive\Документы\check.txt");
-            Console.WriteLine(Request.MakeRequest(Request.GetRandomEmail(), Request.GetRandomWord(Request.GetWords(request))).Result);
-
+            await Request.MakeRequest(Request.GetRandomEmail(), Request.GetRandomWord(Request.GetWords(request)));
         }
         public class Request
         {
@@ -56,26 +57,19 @@ namespace WordOfTheDay.PerformanceCheck
 
                 return email += emails[random.Next(emails.Length)];
             }
-            public static async Task<string> MakeRequest(string _email, string _text)
+            public static async Task MakeRequest(string email, string text)
             {
-                WebRequest request = WebRequest.Create("https://localhost:5001/api/words");
-                string postData = @"{{""email"" : "_email"}, {""text"" : "_text"}}";
-                request.Method = "POST";
-                request.ContentType = "application/json";
-                request.ContentLength = postData.Length;
-                StreamWriter requestWriter = new(request.GetRequestStream());
-                requestWriter.Write(postData);
-                WebResponse response = await request.GetResponseAsync();
-                string result = null;
-
-                using (Stream stream = response.GetResponseStream())
+                var url = "https://localhost:5001/api/words";
+                var jsonSerializerOptions = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
+                using (var httpClient = new HttpClient())
                 {
-                    using StreamReader reader = new(stream);
-                    result = reader.ReadToEnd();
+                    var newWord = new Word() { Email = email, Text = text };
+                    var response = await httpClient.PostAsJsonAsync(url, newWord);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        Console.WriteLine("Request failed.");
+                    }
                 }
-                response.Close();
-
-                return result;
             }
         }
     }
