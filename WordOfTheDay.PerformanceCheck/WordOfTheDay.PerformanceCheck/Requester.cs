@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Diagnostics;
+using System.Threading;
 
 namespace WordOfTheDay.PerformanceCheck
 {
@@ -21,6 +22,8 @@ namespace WordOfTheDay.PerformanceCheck
         private List<string> GetWords()
         {
             var words = File.ReadAllText(WordsFile).Split().ToList();
+
+            words.RemoveAll(x => x == "");
 
             return words;
         }
@@ -45,32 +48,51 @@ namespace WordOfTheDay.PerformanceCheck
 
             return $"{email}{domain}";
         }
-        private static async Task MakeRequest(string email, string text, HttpClient httpClient)
+        private List<Word> MakeWords()
         {
-            var url = "https://localhost:5001/api/words";
-            var newWord = new Word { Email = email, Text = text };
-            await httpClient.PostAsJsonAsync(url, newWord);
-        }
-        private async Task<List<float>> MeasureRequestTime()
-        {
-            using var httpClient = new HttpClient();
+            var words = new List<Word> { };
             var wordsList = GetWords();
-            var measurements = new List<float>();
             for (int i = 0; i < AmountOfQueries; i++)
             {
-                var email = GetRandomEmail();
-                var text = GetRandomWord(wordsList);
-                var watch = new Stopwatch();
+                words.Add(new Word { Email = GetRandomEmail(), Text = GetRandomWord(wordsList) });
+            }
+            return words;
+        }
+        private async Task<List<float>> MakeAllRequests()
+        {
+            using var httpClient = new HttpClient();
+            var tasks = new List<Task>();
+            var measurements = new List<float>();
+            var url = "https://localhost:5001/api/words";
+            var maxThreads = 10;
+            var watch = new Stopwatch();
+            var throttler = new SemaphoreSlim(initialCount: maxThreads);
+
+            foreach (var newWord in MakeWords())
+            {
+                await throttler.WaitAsync();
                 watch.Start();
-                await MakeRequest(email, text, httpClient);
+                tasks.Add(
+                    Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await httpClient.PostAsJsonAsync(url, newWord);
+                        }
+                        finally
+                        {
+                            throttler.Release();
+                        }
+                    }));
                 watch.Stop();
                 measurements.Add(watch.ElapsedMilliseconds);
             }
+            await Task.WhenAll(tasks);
             return measurements;
         }
         public async Task ShowTimeMeasuruments()
         {
-            var measurements = await MeasureRequestTime();
+            var measurements = await MakeAllRequests();
             Console.WriteLine($"Max time for request: {measurements.Max()}");
             Console.WriteLine($"Min time for request: {measurements.Min()}");
             Console.WriteLine($"Average time for request: {measurements.Average()}");
