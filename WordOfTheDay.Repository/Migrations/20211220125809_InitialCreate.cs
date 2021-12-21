@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace WordOfTheDay.Migrations
+namespace WordOfTheDay.Repository.Migrations
 {
     public partial class InitialCreate : Migration
     {
@@ -13,7 +13,8 @@ namespace WordOfTheDay.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Text = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Text = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    AddTime = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {

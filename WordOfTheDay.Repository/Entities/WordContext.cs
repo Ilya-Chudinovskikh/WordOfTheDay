@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
-namespace WordOfTheDay.Entities
+namespace WordOfTheDay.Repository.Entities
 {
     public class WordContext : DbContext
     {
@@ -9,6 +12,7 @@ namespace WordOfTheDay.Entities
             : base(options)
         {
         }
+
         public DbSet<Word> Words { get; set; }
     }
 }
