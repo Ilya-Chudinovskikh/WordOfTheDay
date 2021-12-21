@@ -16,7 +16,7 @@ namespace WordOfTheDay.PerformanceCheck
     {
         static async Task Main()
         {
-            Requester request = new(20, @"C:\Users\Илья\OneDrive\Документы\check.txt");
+            Requester request = new(10000, @"C:\Users\Илья\OneDrive\Документы\check.txt");
             await request.ShowTimeMeasuruments();
         }
     }
