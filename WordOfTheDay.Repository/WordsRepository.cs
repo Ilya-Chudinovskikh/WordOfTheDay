@@ -1,68 +1,76 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WordOfTheDay.Repository.Entities;
-using System.Threading;
+using WordOfTheDay.Repository.Models;
+using LinqKit;
 
 namespace WordOfTheDay.Repository
 {
     public static class WordsRepository
     {
-        public static async Task<(string, int)> WordOfTheDay(WordContext _context)
+        public static async Task<WordCount> WordOfTheDay(WordContext context)
         {
-            var wordOfTheDayType = await _context.Words.GroupBy(word => word.Text, (text, words)=> new { text, words = words.Count(word=>word.Text==text)})
+            var wordOfTheDayType = await context.Words.GroupBy(word => word.Text, (text, words)=> new { text, words = words.Count(word=>word.Text==text)})
                 .OrderByDescending(el => el.words).FirstOrDefaultAsync();
 
-            var wordOfTheDay = (wordOfTheDayType.text, wordOfTheDayType.words);
+            var wordOfTheDay = new WordCount(wordOfTheDayType.text, wordOfTheDayType.words);
 
             return wordOfTheDay;
         }
-        public static async Task<int> CountWord(WordContext _context, string text)
+        public static async Task<int> CountWord(WordContext context, string text)
         {
-            var count = await _context.Words.CountAsync(_word => _word.Text == text);
+            var count = await context.Words.CountAsync(_word => _word.Text == text);
 
             return count;
         }
-        public static IQueryable<Word> CloseWords(WordContext _context, Word word)
+        public static IQueryable<Word> CloseWords(WordContext context, string word)
         {
-            List<(string, int)> closeWords = new();
-            List<string> keys = new();
-            IQueryable<Word> query = _context.Words;
-            string text = word.Text;
-            int len = text.Length;
+            var keys = new List<string>();
+            var len = word.Length;
 
 
-            for (int i = 0; i < len; i++)
+            for (var i = 0; i < len; i++)
                 if (i == 0)
-                    keys.Add('%' + text.Substring(1, len - 1));
+                {
+                    keys.Add($"%{word.Substring(1, len - 1)}");
+                }
                 else if (i == len - 1)
-                    keys.Add(text.Substring(0, i) + '%');
+                {
+                    keys.Add($"{word.Substring(0, i)}%");
+                }
                 else
-                    keys.Add(text.Substring(0, i) + '%' + text.Substring(i + 1, len - i - 1));
+                {
+                    keys.Add($"{word.Substring(0, i)}%{word.Substring(i + 1, len - i - 1)}");
+                }
 
+            var predicate = PredicateBuilder.New<Word>();
 
             foreach (string key in keys)
-                query = query.Where(closeWord => EF.Functions.Like(text, key) && closeWord.Text.Length <= text.Length + 1);
+            {
+                predicate = predicate.Or(
+                    closeWord => EF.Functions.Like(closeWord.Text, key) 
+                    && closeWord.Text.Length <= len + 1 
+                    && closeWord.Text != word);
+            }
 
-            return query;
+            var result =  context.Words.AsExpandable().Where(predicate);
+
+            return result;
         }
        
-        public static async Task<Word> PostWord(Word word, WordContext _context)
+        public static async Task PostWord(Word word, WordContext context)
         {
-            _context.Words.Add(word);
-            await _context.SaveChangesAsync();
-
-            return word;
+            context.Words.Add(word);
+            await context.SaveChangesAsync();
         }
-        public static async Task<bool> IsAlreadyExist(Word word, WordContext _context)
+        public static async Task<bool> IsAlreadyExist(Word word, WordContext context)
         {
-            bool exist = await _context.Words.AnyAsync(w => w.Email == word.Email);
+            var exist = await context.Words.AnyAsync(w => w.Email == word.Email);
 
             return exist;
         }
     }
 }
+

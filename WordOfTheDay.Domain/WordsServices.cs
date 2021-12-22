@@ -1,41 +1,46 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using WordOfTheDay.Repository.Entities;
-using System.Threading;
 using WordOfTheDay.Repository;
+using WordOfTheDay.Repository.Models;
 
 namespace WordOfTheDay.Domain
 {
     public static class WordsServices
     {
         
-        public static async Task<(string, int)> WordOfTheDay(WordContext _context)
+        public static  Task<WordCount> WordOfTheDay(WordContext context)
         {
-            var wordOfTheDay = await WordsRepository.WordOfTheDay(_context);
+            var wordOfTheDay = WordsRepository.WordOfTheDay(context);
 
             return wordOfTheDay;
         }
         
-        public static async Task<Word> PostWord(Word word, WordContext _context)
+        public static async Task<List<WordCount>> CloseWords(WordContext context, string word)
+        {
+            var closeWords = WordsRepository.CloseWords(context, word);
+            var closeWordCounts = new List<WordCount>();
+
+            foreach (var w in closeWords)
+            {
+                closeWordCounts.Add(new WordCount(w.Text, await WordsRepository.CountWord(context, w.Text)));
+            }
+
+            return closeWordCounts;
+        }
+        public static async Task PostWord(Word word, WordContext context)
         {
             word.AddTime = DateTime.Now;
 
-            await WordsRepository.PostWord(word, _context);
-
-            return word;
+            await WordsRepository.PostWord(word, context);
         }
-        public static async Task<bool> IsAlreadyExist(Word word, WordContext _context)
+        public static Task<bool> IsAlreadyExist(Word word, WordContext context)
         {
-            var exist = await WordsRepository.IsAlreadyExist(word, _context);
+            var exist = WordsRepository.IsAlreadyExist(word, context);
 
             return exist;
         }
-        
     }
 }
 

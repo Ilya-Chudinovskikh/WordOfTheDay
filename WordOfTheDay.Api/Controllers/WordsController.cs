@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using WordOfTheDay.Repository.Entities;
-using System.Threading;
 using WordOfTheDay.Domain;
-using System.Diagnostics;
-using WordOfTheDay.Api.Models;
 
 namespace WordOfTheDay.Controllers
 {
@@ -26,9 +18,7 @@ namespace WordOfTheDay.Controllers
         [HttpGet("get-word-of-the-day")]
         public async Task<IActionResult> GetWordOfTheDay()
         {
-            var tuple = await WordsServices.WordOfTheDay(_context);
-
-            WordCount wordOfTheDay = new(tuple.Item1, tuple.Item2);
+            var wordOfTheDay = await WordsServices.WordOfTheDay(_context);
 
             if (wordOfTheDay == null)
             {
@@ -38,14 +28,18 @@ namespace WordOfTheDay.Controllers
             return Ok(wordOfTheDay);
         }
 
-        
+        [HttpGet("get-closest-words")]
+        public async Task<IActionResult> GetClosestWords()
+        {
+            var wordOfTheDay = await WordsServices.WordOfTheDay(_context);
+            var closestWords = await WordsServices.CloseWords(_context, wordOfTheDay.Word);
+
+            return Ok(closestWords);
+        }
 
         [HttpPost]
         public async Task<IActionResult> PostWord(Word word)
         {
-            var watch = new Stopwatch();
-            watch.Start();
-
             if (word == null)
             {
                 return BadRequest();
@@ -58,9 +52,6 @@ namespace WordOfTheDay.Controllers
                 return BadRequest(ModelState);
 
             await WordsServices.PostWord(word, _context);
-
-            watch.Stop();
-            Console.WriteLine($"PostWord: {watch.ElapsedMilliseconds}");
 
             return Ok(word);
         }

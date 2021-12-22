@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace WordOfTheDay.Api.Models
+﻿
+namespace WordOfTheDay.Repository.Models
 {
     public class WordCount
     {
