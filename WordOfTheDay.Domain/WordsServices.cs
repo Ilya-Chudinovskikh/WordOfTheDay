@@ -29,11 +29,11 @@ namespace WordOfTheDay.Domain
 
             return closeWordCounts;
         }
-        public static async Task PostWord(Word word, WordContext context)
+        public static Task PostWord(Word word, WordContext context)
         {
             word.AddTime = DateTime.Now;
 
-            await WordsRepository.PostWord(word, context);
+            return WordsRepository.PostWord(word, context);
         }
         public static Task<bool> IsAlreadyExist(Word word, WordContext context)
         {

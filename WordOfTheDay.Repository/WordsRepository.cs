@@ -27,23 +27,7 @@ namespace WordOfTheDay.Repository
         }
         public static IQueryable<Word> CloseWords(WordContext context, string word)
         {
-            var keys = new List<string>();
-            var len = word.Length;
-
-
-            for (var i = 0; i < len; i++)
-                if (i == 0)
-                {
-                    keys.Add($"%{word.Substring(1, len - 1)}");
-                }
-                else if (i == len - 1)
-                {
-                    keys.Add($"{word.Substring(0, i)}%");
-                }
-                else
-                {
-                    keys.Add($"{word.Substring(0, i)}%{word.Substring(i + 1, len - i - 1)}");
-                }
+            var keys = GetKeys(word);
 
             var predicate = PredicateBuilder.New<Word>();
 
@@ -51,7 +35,7 @@ namespace WordOfTheDay.Repository
             {
                 predicate = predicate.Or(
                     closeWord => EF.Functions.Like(closeWord.Text, key) 
-                    && closeWord.Text.Length <= len + 1 
+                    && closeWord.Text.Length <= word.Length + 1 
                     && closeWord.Text != word);
             }
 
@@ -70,6 +54,29 @@ namespace WordOfTheDay.Repository
             var exist = await context.Words.AnyAsync(w => w.Email == word.Email);
 
             return exist;
+        }
+        public static List<string> GetKeys(string word)
+        {
+            var keys = new List<string>();
+            var len = word.Length;
+
+            for (var i = 0; i < len; i++)
+            {
+                if (i == 0)
+                {
+                    keys.Add($"%{word.Substring(1, len - 1)}");
+                }
+                else if (i == len - 1)
+                {
+                    keys.Add($"{word.Substring(0, i)}%");
+                }
+                else
+                {
+                    keys.Add($"{word.Substring(0, i)}%{word.Substring(i + 1, len - i - 1)}");
+                }
+            }
+
+            return keys;
         }
     }
 }
