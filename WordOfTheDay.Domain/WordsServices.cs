@@ -7,40 +7,44 @@ using WordOfTheDay.Repository.Models;
 
 namespace WordOfTheDay.Domain
 {
-    public static class WordsServices
+    public class WordsServices : IWordsServices
     {
-        
-        public static  Task<WordCount> WordOfTheDay(WordContext context)
+        private readonly IWordsRepository _iWordsRepository;
+        public WordsServices (IWordsRepository iWordsRepository)
         {
-            var wordOfTheDay = WordsRepository.WordOfTheDay(context);
+            _iWordsRepository = iWordsRepository;
+        }
+        
+        public Task<WordCount> WordOfTheDay()
+        {
+            var wordOfTheDay = _iWordsRepository.WordOfTheDay();
 
             return wordOfTheDay;
         }
         
-        public static async Task<List<WordCount>> CloseWords(WordContext context, string word)
+        public async Task<List<WordCount>> CloseWords(string word)
         {
-            var closeWords = WordsRepository.CloseWords(context, word);
+            var closeWords = _iWordsRepository.CloseWords(word);
             var closeWordCounts = new List<WordCount>();
 
             foreach (var w in closeWords)
             {
-                closeWordCounts.Add(new WordCount(w.Text, await WordsRepository.CountWord(context, w.Text)));
+                closeWordCounts.Add(new WordCount(w.Text, await _iWordsRepository.CountWord(w.Text)));
             }
 
             return closeWordCounts;
         }
-        public static Task PostWord(Word word, WordContext context)
+        public Task PostWord(Word word)
         {
             word.AddTime = DateTime.Now;
 
-            return WordsRepository.PostWord(word, context);
+            return _iWordsRepository.PostWord(word);
         }
-        public static Task<bool> IsAlreadyExist(Word word, WordContext context)
+        public Task<bool> IsAlreadyExist(Word word)
         {
-            var exist = WordsRepository.IsAlreadyExist(word, context);
+            var exist = _iWordsRepository.IsAlreadyExist(word);
 
             return exist;
         }
     }
 }
-

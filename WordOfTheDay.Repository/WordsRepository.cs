@@ -8,24 +8,29 @@ using LinqKit;
 
 namespace WordOfTheDay.Repository
 {
-    public static class WordsRepository
+    public class WordsRepository : IWordsRepository
     {
-        public static async Task<WordCount> WordOfTheDay(WordContext context)
+        private readonly WordContext _context;
+        public WordsRepository(WordContext context)
         {
-            var wordOfTheDayType = await context.Words.GroupBy(word => word.Text, (text, words)=> new { text, words = words.Count(word=>word.Text==text)})
+            _context = context;
+        }
+        public async Task<WordCount> WordOfTheDay()
+        {
+            var wordOfTheDayType = await _context.Words.GroupBy(word => word.Text, (text, words)=> new { text, words = words.Count(word=>word.Text==text)})
                 .OrderByDescending(el => el.words).FirstOrDefaultAsync();
 
             var wordOfTheDay = new WordCount(wordOfTheDayType.text, wordOfTheDayType.words);
 
             return wordOfTheDay;
         }
-        public static async Task<int> CountWord(WordContext context, string text)
+        public async Task<int> CountWord(string text)
         {
-            var count = await context.Words.CountAsync(_word => _word.Text == text);
+            var count = await _context.Words.CountAsync(_word => _word.Text == text);
 
             return count;
         }
-        public static IQueryable<Word> CloseWords(WordContext context, string word)
+        public IQueryable<Word> CloseWords(string word)
         {
             var keys = GetKeys(word);
 
@@ -39,19 +44,19 @@ namespace WordOfTheDay.Repository
                     && closeWord.Text != word);
             }
 
-            var result =  context.Words.AsExpandable().Where(predicate);
+            var result =  _context.Words.AsExpandable().Where(predicate);
 
             return result;
         }
        
-        public static async Task PostWord(Word word, WordContext context)
+        public async Task PostWord(Word word)
         {
-            context.Words.Add(word);
-            await context.SaveChangesAsync();
+            _context.Words.Add(word);
+            await _context.SaveChangesAsync();
         }
-        public static async Task<bool> IsAlreadyExist(Word word, WordContext context)
+        public async Task<bool> IsAlreadyExist(Word word)
         {
-            var exist = await context.Words.AnyAsync(w => w.Email == word.Email);
+            var exist = await _context.Words.AnyAsync(w => w.Email == word.Email);
 
             return exist;
         }
@@ -80,4 +85,3 @@ namespace WordOfTheDay.Repository
         }
     }
 }
-
