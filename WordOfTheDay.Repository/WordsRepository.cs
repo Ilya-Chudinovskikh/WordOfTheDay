@@ -1,36 +1,83 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using WordOfTheDay.Entities;
-using System.Threading;
+using WordOfTheDay.Repository.Entities;
+using WordOfTheDay.Repository.Models;
+using LinqKit;
 
 namespace WordOfTheDay.Repository
 {
     public static class WordsRepository
     {
-        public static async Task<List<Word>> AllWords(WordContext _context)
+        public static async Task<WordCount> WordOfTheDay(WordContext context)
         {
-            var allWords = await _context.Words.ToListAsync();
+            var wordOfTheDayType = await context.Words.GroupBy(word => word.Text, (text, words)=> new { text, words = words.Count(word=>word.Text==text)})
+                .OrderByDescending(el => el.words).FirstOrDefaultAsync();
 
-            return allWords;
+            var wordOfTheDay = new WordCount(wordOfTheDayType.text, wordOfTheDayType.words);
+
+            return wordOfTheDay;
         }
-
-        public static async Task<Word> GetWordById(Guid id, WordContext _context)
+        public static async Task<int> CountWord(WordContext context, string text)
         {
-            var word = await _context.Words.FindAsync(id);
+            var count = await context.Words.CountAsync(_word => _word.Text == text);
 
-            return word;
+            return count;
         }
-        public static async Task<Word> PostWord(Word word, WordContext _context)
+        public static IQueryable<Word> CloseWords(WordContext context, string word)
         {
-            _context.Words.Add(word);
-            await _context.SaveChangesAsync();
+            var keys = GetKeys(word);
 
-            return word;
+            var predicate = PredicateBuilder.New<Word>();
+
+            foreach (string key in keys)
+            {
+                predicate = predicate.Or(
+                    closeWord => EF.Functions.Like(closeWord.Text, key) 
+                    && closeWord.Text.Length <= word.Length + 1 
+                    && closeWord.Text != word);
+            }
+
+            var result =  context.Words.AsExpandable().Where(predicate);
+
+            return result;
+        }
+       
+        public static async Task PostWord(Word word, WordContext context)
+        {
+            context.Words.Add(word);
+            await context.SaveChangesAsync();
+        }
+        public static async Task<bool> IsAlreadyExist(Word word, WordContext context)
+        {
+            var exist = await context.Words.AnyAsync(w => w.Email == word.Email);
+
+            return exist;
+        }
+        public static List<string> GetKeys(string word)
+        {
+            var keys = new List<string>();
+            var len = word.Length;
+
+            for (var i = 0; i < len; i++)
+            {
+                if (i == 0)
+                {
+                    keys.Add($"%{word.Substring(1, len - 1)}");
+                }
+                else if (i == len - 1)
+                {
+                    keys.Add($"{word.Substring(0, i)}%");
+                }
+                else
+                {
+                    keys.Add($"{word.Substring(0, i)}%{word.Substring(i + 1, len - i - 1)}");
+                }
+            }
+
+            return keys;
         }
     }
 }
+

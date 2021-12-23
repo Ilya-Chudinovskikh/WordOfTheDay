@@ -1,7 +1,6 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
-namespace WordOfTheDay.Entities
+namespace WordOfTheDay.Repository.Entities
 {
     public class WordContext : DbContext
     {
@@ -9,6 +8,7 @@ namespace WordOfTheDay.Entities
             : base(options)
         {
         }
+
         public DbSet<Word> Words { get; set; }
     }
 }

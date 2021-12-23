@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
-using WordOfTheDay.Entities;
+using WordOfTheDay.Repository.Entities;
 
 namespace WordOfTheDay
 {
@@ -21,8 +21,9 @@ namespace WordOfTheDay
         {
 
             services.AddControllers();
+
             services.AddDbContext<WordContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("WordContext")));
+                    options.UseSqlServer(Configuration.GetConnectionString("WordContext")));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
