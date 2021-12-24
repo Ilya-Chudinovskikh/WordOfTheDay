@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Diagnostics;
 using System.Threading;
+using System.Collections.Concurrent;
 
 namespace WordOfTheDay.PerformanceCheck
 {
@@ -61,31 +62,25 @@ namespace WordOfTheDay.PerformanceCheck
         private async Task<List<float>> MakeAllRequests()
         {
             using var httpClient = new HttpClient();
-            var tasks = new List<Task>();
+            var tasks = new ConcurrentBag<Task>();
             var measurements = new List<float>();
             var url = "https://localhost:5001/api/words";
-            var maxThreads = 10;
-            var watch = new Stopwatch();
-            var throttler = new SemaphoreSlim(initialCount: maxThreads);
+            var maxThreads = 100;
+            var queue = new ConcurrentQueue<Word>(MakeWords());
 
-            foreach (var newWord in MakeWords())
+            for (int i = 0; i < maxThreads; i++)
             {
-                await throttler.WaitAsync();
-                watch.Start();
-                tasks.Add(
-                    Task.Run(async () =>
+                tasks.Add(Task.Run(async () =>
+                {
+                    while (queue.TryDequeue(out Word newWord))
                     {
-                        try
-                        {
-                            await httpClient.PostAsJsonAsync(url, newWord);
-                        }
-                        finally
-                        {
-                            throttler.Release();
-                        }
-                    }));
-                watch.Stop();
-                measurements.Add(watch.ElapsedMilliseconds);
+                        var watch = new Stopwatch();
+                        watch.Start();
+                        await httpClient.PostAsJsonAsync(url, newWord);
+                        watch.Stop();
+                        measurements.Add(watch.ElapsedMilliseconds);
+                    }
+                }));
             }
             await Task.WhenAll(tasks);
             return measurements;
