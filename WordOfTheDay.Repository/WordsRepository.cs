@@ -25,7 +25,7 @@ namespace WordOfTheDay.Repository
             
             return wordOfTheDay;
         }
-        public List<WordCount> CloseWords(string word)
+        public Task<List<WordCount>> CloseWords(string word)
         {
             var keys = GetKeys(word);
 
@@ -41,12 +41,10 @@ namespace WordOfTheDay.Repository
 
             var closeWords = _context.Words
                 .AsExpandable().Where(predicate)
-                .GroupBy(word => word.Text, (text, words) => new WordCount(text, words.Count(word => word.Text == text)))
-                .ToList();
+                .GroupBy(word => word.Text, (text, words) => new WordCount(text, words.Count(word => word.Text == text)));
 
-            return closeWords;
+            return Task.FromResult(closeWords.ToList());
         }
-       
         public async Task PostWord(Word word)
         {
             _context.Words.Add(word);

@@ -24,10 +24,7 @@ namespace WordOfTheDay
 
             services.AddControllers();
 
-            services.AddDbContext<WordContext>(options =>
-                    options.UseSqlServer(Configuration.GetConnectionString("WordContext")));
-
-            services.AddRepositories();
+            services.AddRepositories(Configuration.GetConnectionString("WordContext"));
             services.AddDomain();
         }
 

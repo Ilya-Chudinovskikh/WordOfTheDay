@@ -22,7 +22,7 @@ namespace WordOfTheDay.Domain
             return wordOfTheDay;
         }
         
-        public List<WordCount> CloseWords(string word)
+        public Task<List<WordCount>> CloseWords(string word)
         {
             var closeWords = _wordsRepository.CloseWords(word);
 

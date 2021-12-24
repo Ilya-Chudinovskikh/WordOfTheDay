@@ -62,8 +62,8 @@ namespace WordOfTheDay.PerformanceCheck
         private async Task<List<float>> MakeAllRequests()
         {
             using var httpClient = new HttpClient();
-            var tasks = new ConcurrentBag<Task>();
-            var measurements = new List<float>();
+            var tasks = new List<Task>();
+            var measurements = new ConcurrentBag<float>();
             var url = "https://localhost:5001/api/words";
             var maxThreads = 100;
             var queue = new ConcurrentQueue<Word>(MakeWords());
@@ -83,7 +83,7 @@ namespace WordOfTheDay.PerformanceCheck
                 }));
             }
             await Task.WhenAll(tasks);
-            return measurements;
+            return measurements.ToList();
         }
         public async Task ShowTimeMeasuruments()
         {
