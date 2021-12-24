@@ -8,7 +8,7 @@ using LinqKit;
 
 namespace WordOfTheDay.Repository
 {
-    public class WordsRepository : IWordsRepository
+    internal sealed class WordsRepository : IWordsRepository
     {
         private readonly WordContext _context;
         public WordsRepository(WordContext context)
@@ -17,20 +17,15 @@ namespace WordOfTheDay.Repository
         }
         public async Task<WordCount> WordOfTheDay()
         {
-            var wordOfTheDayType = await _context.Words.GroupBy(word => word.Text, (text, words)=> new { text, words = words.Count(word=>word.Text==text)})
+            var wordOfTheDayType = await _context.Words
+                .GroupBy(word => word.Text, (text, words) => new { text, words = words.Count(word => word.Text == text) })
                 .OrderByDescending(el => el.words).FirstOrDefaultAsync();
 
             var wordOfTheDay = new WordCount(wordOfTheDayType.text, wordOfTheDayType.words);
-
+            
             return wordOfTheDay;
         }
-        public async Task<int> CountWord(string text)
-        {
-            var count = await _context.Words.CountAsync(_word => _word.Text == text);
-
-            return count;
-        }
-        public IQueryable<Word> CloseWords(string word)
+        public List<WordCount> CloseWords(string word)
         {
             var keys = GetKeys(word);
 
@@ -44,9 +39,12 @@ namespace WordOfTheDay.Repository
                     && closeWord.Text != word);
             }
 
-            var result =  _context.Words.AsExpandable().Where(predicate);
+            var closeWords = _context.Words
+                .AsExpandable().Where(predicate)
+                .GroupBy(word => word.Text, (text, words) => new WordCount(text, words.Count(word => word.Text == text)))
+                .ToList();
 
-            return result;
+            return closeWords;
         }
        
         public async Task PostWord(Word word)

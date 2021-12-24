@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using WordOfTheDay.Repository.Entities;
 using WordOfTheDay.Repository.Models;
@@ -9,9 +9,7 @@ namespace WordOfTheDay.Repository
     {
         Task<WordCount> WordOfTheDay();
 
-        Task<int> CountWord(string text);
-
-        IQueryable<Word> CloseWords(string word);
+        List<WordCount> CloseWords(string word);
 
         Task PostWord(Word word);
 

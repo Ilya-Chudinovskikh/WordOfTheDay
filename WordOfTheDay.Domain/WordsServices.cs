@@ -7,42 +7,36 @@ using WordOfTheDay.Repository.Models;
 
 namespace WordOfTheDay.Domain
 {
-    public class WordsServices : IWordsServices
+    internal sealed class WordsServices : IWordsServices
     {
-        private readonly IWordsRepository _iWordsRepository;
-        public WordsServices (IWordsRepository iWordsRepository)
+        private readonly IWordsRepository _wordsRepository;
+        public WordsServices (IWordsRepository wordsRepository)
         {
-            _iWordsRepository = iWordsRepository;
+            _wordsRepository = wordsRepository;
         }
         
         public Task<WordCount> WordOfTheDay()
         {
-            var wordOfTheDay = _iWordsRepository.WordOfTheDay();
+            var wordOfTheDay = _wordsRepository.WordOfTheDay();
 
             return wordOfTheDay;
         }
         
-        public async Task<List<WordCount>> CloseWords(string word)
+        public List<WordCount> CloseWords(string word)
         {
-            var closeWords = _iWordsRepository.CloseWords(word);
-            var closeWordCounts = new List<WordCount>();
+            var closeWords = _wordsRepository.CloseWords(word);
 
-            foreach (var w in closeWords)
-            {
-                closeWordCounts.Add(new WordCount(w.Text, await _iWordsRepository.CountWord(w.Text)));
-            }
-
-            return closeWordCounts;
+            return closeWords;
         }
         public Task PostWord(Word word)
         {
             word.AddTime = DateTime.Now;
 
-            return _iWordsRepository.PostWord(word);
+            return _wordsRepository.PostWord(word);
         }
         public Task<bool> IsAlreadyExist(Word word)
         {
-            var exist = _iWordsRepository.IsAlreadyExist(word);
+            var exist = _wordsRepository.IsAlreadyExist(word);
 
             return exist;
         }

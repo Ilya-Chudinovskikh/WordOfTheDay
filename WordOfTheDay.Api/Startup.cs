@@ -27,8 +27,8 @@ namespace WordOfTheDay
             services.AddDbContext<WordContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("WordContext")));
 
-            services.AddScoped<IWordsRepository, WordsRepository>();
-            services.AddScoped<IWordsServices, WordsServices>();
+            services.AddRepositories();
+            services.AddDomain();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -10,7 +10,7 @@ namespace WordOfTheDay.Domain
     {
         Task<WordCount> WordOfTheDay();
 
-        Task<List<WordCount>> CloseWords(string word);
+        List<WordCount> CloseWords(string word);
 
         Task PostWord(Word word);
 

@@ -9,16 +9,16 @@ namespace WordOfTheDay.Controllers
     [ApiController]
     public class WordsController : ControllerBase
     {
-        private readonly IWordsServices _iWordsServices;
-        public WordsController(IWordsServices iWordsServices)
+        private readonly IWordsServices _wordsServices;
+        public WordsController(IWordsServices wordsServices)
         {
-            _iWordsServices = iWordsServices;
+            _wordsServices = wordsServices;
         }
 
         [HttpGet("get-word-of-the-day")]
         public async Task<IActionResult> GetWordOfTheDay()
         {
-            var wordOfTheDay = await _iWordsServices.WordOfTheDay();
+            var wordOfTheDay = await _wordsServices.WordOfTheDay();
 
             if (wordOfTheDay == null)
             {
@@ -31,8 +31,8 @@ namespace WordOfTheDay.Controllers
         [HttpGet("get-closest-words")]
         public async Task<IActionResult> GetClosestWords()
         {
-            var wordOfTheDay = await _iWordsServices.WordOfTheDay();
-            var closestWords = await _iWordsServices.CloseWords(wordOfTheDay.Word);
+            var wordOfTheDay = await _wordsServices.WordOfTheDay();
+            var closestWords = _wordsServices.CloseWords(wordOfTheDay.Word);
 
             return Ok(closestWords);
         }
@@ -45,13 +45,13 @@ namespace WordOfTheDay.Controllers
                 return BadRequest();
             }
 
-            if (await _iWordsServices.IsAlreadyExist(word))
+            if (await _wordsServices.IsAlreadyExist(word))
                 ModelState.AddModelError("Email", "Users with the same email address can add only one word per day!");
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            await _iWordsServices.PostWord(word);
+            await _wordsServices.PostWord(word);
 
             return Ok(word);
         }
