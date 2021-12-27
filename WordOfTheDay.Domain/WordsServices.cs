@@ -30,9 +30,16 @@ namespace WordOfTheDay.Domain
         }
         public Task PostWord(Word word)
         {
-            word.AddTime = DateTime.Now;
+            word.AddTime = DateTime.UtcNow;
 
             return _wordsRepository.PostWord(word);
+        }
+        public Task<WordCount> UserWord(string email)
+        {
+            var userWord = _wordsRepository.UserWord(email);
+
+            return userWord;
+
         }
         public Task<bool> IsAlreadyExist(Word word)
         {

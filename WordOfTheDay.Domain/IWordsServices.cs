@@ -14,6 +14,8 @@ namespace WordOfTheDay.Domain
 
         Task PostWord(Word word);
 
+        Task<WordCount> UserWord(string email);
+
         Task<bool> IsAlreadyExist(Word word);
 
     }

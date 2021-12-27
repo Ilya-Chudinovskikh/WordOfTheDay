@@ -37,6 +37,14 @@ namespace WordOfTheDay.Controllers
             return Ok(closestWords);
         }
 
+        [HttpGet("{email}")]
+        public async Task<IActionResult> GetUserWord(string email)
+        {
+            var userWord = await _wordsServices.UserWord(email);
+
+            return Ok(userWord);
+        }
+
         [HttpPost]
         public async Task<IActionResult> PostWord(Word word)
         {
