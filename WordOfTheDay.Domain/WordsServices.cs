@@ -7,40 +7,38 @@ using WordOfTheDay.Repository.Models;
 
 namespace WordOfTheDay.Domain
 {
-    public static class WordsServices
+    internal sealed class WordsServices : IWordsServices
     {
-        
-        public static  Task<WordCount> WordOfTheDay(WordContext context)
+        private readonly IWordsRepository _wordsRepository;
+        public WordsServices (IWordsRepository wordsRepository)
         {
-            var wordOfTheDay = WordsRepository.WordOfTheDay(context);
+            _wordsRepository = wordsRepository;
+        }
+        
+        public Task<WordCount> WordOfTheDay()
+        {
+            var wordOfTheDay = _wordsRepository.WordOfTheDay();
 
             return wordOfTheDay;
         }
         
-        public static async Task<List<WordCount>> CloseWords(WordContext context, string word)
+        public Task<List<WordCount>> CloseWords(string word)
         {
-            var closeWords = WordsRepository.CloseWords(context, word);
-            var closeWordCounts = new List<WordCount>();
+            var closeWords = _wordsRepository.CloseWords(word);
 
-            foreach (var w in closeWords)
-            {
-                closeWordCounts.Add(new WordCount(w.Text, await WordsRepository.CountWord(context, w.Text)));
-            }
-
-            return closeWordCounts;
+            return closeWords;
         }
-        public static Task PostWord(Word word, WordContext context)
+        public Task PostWord(Word word)
         {
             word.AddTime = DateTime.Now;
 
-            return WordsRepository.PostWord(word, context);
+            return _wordsRepository.PostWord(word);
         }
-        public static Task<bool> IsAlreadyExist(Word word, WordContext context)
+        public Task<bool> IsAlreadyExist(Word word)
         {
-            var exist = WordsRepository.IsAlreadyExist(word, context);
+            var exist = _wordsRepository.IsAlreadyExist(word);
 
             return exist;
         }
     }
 }
-
