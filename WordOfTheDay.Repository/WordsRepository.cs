@@ -30,8 +30,10 @@ namespace WordOfTheDay.Repository
             
             return wordOfTheDay;
         }
-        public Task<List<WordCount>> CloseWords(string word)
+        public async Task<List<WordCount>> CloseWords(string email)
         {
+            var word = (await UserWord(email)).Word;
+
             var keys = GetKeys(word);
 
             var predicate = PredicateBuilder.New<Word>();
@@ -41,14 +43,15 @@ namespace WordOfTheDay.Repository
                 predicate = predicate.Or(
                     closeWord => EF.Functions.Like(closeWord.Text, key) 
                     && closeWord.Text.Length <= word.Length + 1 
-                    && closeWord.Text != word);
+                    && closeWord.Text != word
+                    && closeWord.AddTime > DateTime.Today);
             }
 
             var closeWords = _context.Words
                 .AsExpandable().Where(predicate)
                 .GroupBy(word => word.Text, (text, words) => new WordCount(text, words.Count(word => word.Text == text)));
 
-            return Task.FromResult(closeWords.ToList());
+            return closeWords.ToList();
         }
         public async Task PostWord(Word word)
         {
