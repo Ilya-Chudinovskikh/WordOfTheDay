@@ -31,7 +31,6 @@ namespace WordOfTheDay.Controllers
         [HttpGet("get-closest-words/{email}")]
         public async Task<IActionResult> GetClosestWords(string email)
         {
-            //var wordOfTheDay = await _wordsServices.WordOfTheDay();
             var closestWords = await _wordsServices.CloseWords(email);
 
             return Ok(closestWords);
