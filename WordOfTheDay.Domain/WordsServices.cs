@@ -22,17 +22,24 @@ namespace WordOfTheDay.Domain
             return wordOfTheDay;
         }
         
-        public Task<List<WordCount>> CloseWords(string word)
+        public Task<List<WordCount>> CloseWords(string email)
         {
-            var closeWords = _wordsRepository.CloseWords(word);
+            var closeWords = _wordsRepository.CloseWords(email);
 
             return closeWords;
         }
         public Task PostWord(Word word)
         {
-            word.AddTime = DateTime.Now;
+            word.AddTime = DateTime.UtcNow;
 
             return _wordsRepository.PostWord(word);
+        }
+        public Task<WordCount> UserWord(string email)
+        {
+            var userWord = _wordsRepository.UserWord(email);
+
+            return userWord;
+
         }
         public Task<bool> IsAlreadyExist(Word word)
         {

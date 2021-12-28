@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -18,15 +19,21 @@ namespace WordOfTheDay.Repository
         public async Task<WordCount> WordOfTheDay()
         {
             var wordOfTheDayType = await _context.Words
+                .Where(word=>word.AddTime > DateTime.Today.ToUniversalTime())
                 .GroupBy(word => word.Text, (text, words) => new { text, words = words.Count(word => word.Text == text) })
                 .OrderByDescending(el => el.words).FirstOrDefaultAsync();
+
+            if (wordOfTheDayType == null)
+                return null;
 
             var wordOfTheDay = new WordCount(wordOfTheDayType.text, wordOfTheDayType.words);
             
             return wordOfTheDay;
         }
-        public Task<List<WordCount>> CloseWords(string word)
+        public async Task<List<WordCount>> CloseWords(string email)
         {
+            var word = (await UserWord(email)).Word;
+
             var keys = GetKeys(word);
 
             var predicate = PredicateBuilder.New<Word>();
@@ -36,25 +43,41 @@ namespace WordOfTheDay.Repository
                 predicate = predicate.Or(
                     closeWord => EF.Functions.Like(closeWord.Text, key) 
                     && closeWord.Text.Length <= word.Length + 1 
-                    && closeWord.Text != word);
+                    && closeWord.Text != word
+                    && closeWord.AddTime > DateTime.Today.ToUniversalTime());
             }
 
             var closeWords = _context.Words
                 .AsExpandable().Where(predicate)
                 .GroupBy(word => word.Text, (text, words) => new WordCount(text, words.Count(word => word.Text == text)));
 
-            return Task.FromResult(closeWords.ToList());
+            return await closeWords.ToListAsync();
         }
         public async Task PostWord(Word word)
         {
             _context.Words.Add(word);
             await _context.SaveChangesAsync();
         }
-        public async Task<bool> IsAlreadyExist(Word word)
+        public Task<bool> IsAlreadyExist(Word word)
         {
-            var exist = await _context.Words.AnyAsync(w => w.Email == word.Email);
+            var exist = _context.Words
+                .AnyAsync(w => w.Email == word.Email && w.AddTime > DateTime.Today.ToUniversalTime());
 
             return exist;
+        }
+        public async Task<WordCount> UserWord(string email)
+        {
+            var word = await _context.Words
+                .Where(word => word.AddTime > DateTime.Today.ToUniversalTime())
+                .SingleOrDefaultAsync(w=>w.Email==email);
+
+            var userWordAmount = await _context.Words
+                .Where(w => w.AddTime > DateTime.Today.ToUniversalTime() && w.Text == word.Text)
+                .CountAsync();
+
+            var userWord = new WordCount(word.Text, userWordAmount);
+
+            return userWord;
         }
         public static List<string> GetKeys(string word)
         {

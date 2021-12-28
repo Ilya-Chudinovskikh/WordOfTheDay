@@ -28,13 +28,20 @@ namespace WordOfTheDay.Controllers
             return Ok(wordOfTheDay);
         }
 
-        [HttpGet("get-closest-words")]
-        public async Task<IActionResult> GetClosestWords()
+        [HttpGet("get-closest-words/{email}")]
+        public async Task<IActionResult> GetClosestWords(string email)
         {
-            var wordOfTheDay = await _wordsServices.WordOfTheDay();
-            var closestWords = _wordsServices.CloseWords(wordOfTheDay.Word);
+            var closestWords = await _wordsServices.CloseWords(email);
 
             return Ok(closestWords);
+        }
+
+        [HttpGet("{email}")]
+        public async Task<IActionResult> GetUserWord(string email)
+        {
+            var userWord = await _wordsServices.UserWord(email);
+
+            return Ok(userWord);
         }
 
         [HttpPost]
