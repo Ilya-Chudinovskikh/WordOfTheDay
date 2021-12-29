@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using WordOfTheDay.Repository.Entities;
 using WordOfTheDay.Domain;
 
-namespace WordOfTheDay.Controllers
+namespace WordOfTheDay.Api.Controllers
 {
     [Route("api/words")]
     [ApiController]

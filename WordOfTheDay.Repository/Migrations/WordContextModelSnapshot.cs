@@ -16,10 +16,10 @@ namespace WordOfTheDay.Repository.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.12")
+                .HasAnnotation("ProductVersion", "5.0.13")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("WordOfTheDay.Entities.Word", b =>
+            modelBuilder.Entity("WordOfTheDay.Repository.Entities.Word", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -38,6 +38,9 @@ namespace WordOfTheDay.Repository.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex(new[] { "Text" }, "Text_Index")
+                        .IsUnique();
 
                     b.ToTable("Words");
                 });

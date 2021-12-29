@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace WordOfTheDay.Repository.Entities
 {
+    [Index("Text", IsUnique = true, Name = "Text_Index")]
     public class Word
     {
         public Guid Id { get; set; }

@@ -8,7 +8,9 @@ namespace WordOfTheDay.Repository.Entities
             : base(options)
         {
         }
-
-        public DbSet<Word> Words { get; set; }
+        public virtual DbSet<Word> Words { get; set; }
+        public WordContext()
+        {
+        }
     }
 }
