@@ -18,7 +18,7 @@ namespace WordOfTheDay.Tests
     public class UnitTests
     {
         [Fact]
-        public void WordsOfTheDayTest()
+        public async void WordsOfTheDayTest()
         {
             var words = new List<Word>
             {
@@ -33,7 +33,14 @@ namespace WordOfTheDay.Tests
 
             var set = new Mock<DbSet<Word>>();
 
-            set.As<IQueryable<Word>>().Setup(w => w.Provider).Returns(words.Provider);
+            set.As<IDbAsyncEnumerable<Word>>()
+                .Setup(w => w.GetAsyncEnumerator())
+                .Returns(new TestDbAsyncEnumerator<Word>(words.GetEnumerator()));
+
+            set.As<IQueryable<Word>>()
+                .Setup(w => w.Provider)
+                .Returns(new TestDbAsyncQueryProvider<Word>(words.Provider));
+
             set.As<IQueryable<Word>>().Setup(w => w.Expression).Returns(words.Expression);
             set.As<IQueryable<Word>>().Setup(w => w.ElementType).Returns(words.ElementType);
             set.As<IQueryable<Word>>().Setup(w => w.GetEnumerator()).Returns(words.GetEnumerator());
@@ -43,7 +50,7 @@ namespace WordOfTheDay.Tests
 
             var wordsRepository = new WordsRepository(context.Object);
 
-            var wordofTheDay = wordsRepository.WordOfTheDay().Result;
+            var wordofTheDay = await wordsRepository.WordOfTheDay();
 
             Assert.Equal(3, wordofTheDay.Count);
             Assert.Equal("qaz", wordofTheDay.Word);
