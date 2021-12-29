@@ -17,57 +17,6 @@ namespace WordOfTheDay.Tests
 {
     public class UnitTests
     {
-        //[Fact]
-        //public void WordOfTheDayTests()
-        //{
-        //    var words = new List<Word>
-        //    {
-        //        new Word {Id = Guid.NewGuid(), Text = "abc", Email = "123@abc"},
-        //        new Word {Id = Guid.NewGuid(), Text = "wsx", Email = "1234@abc"},
-        //        new Word {Id = Guid.NewGuid(), Text = "qaz", Email = "12345@abc"}
-        //    };
-
-        //    var wordsRepository = new Mock<IWordsRepository>();
-        //    var wordsServices = new Mock<IWordsServices>();
-        //    var controller = new WordsController(wordsServices.Object);
-        //    wordsServices.Setup(repo => repo.WordOfTheDay()).Returns(GetTestWordOfTheDay());
-
-        //    var result = controller.GetWordOfTheDay();
-
-
-        //}
-        //private async Task<WordCount> GetTestWordOfTheDay()
-        //{
-        //    var wc = new WordCount("abc", 19);
-        //    return wc;
-        //    //var users = new List<WordCount>
-        //    //{
-        //    //    new WordCount ("abc", 19),
-        //    //    new WordCount ("wsx", 127),
-        //    //    new WordCount ("qaz", 34),
-        //    //    new WordCount ("abc", 55),
-        //    //    new WordCount ("Golang", 1)
-        //    //};
-        //    //return users;
-        //}
-        //[Fact]
-        //public void WordsOfTheDayRepository()
-        //{
-        //    var words = new List<Word>
-        //    {
-        //        new Word {Id = Guid.NewGuid(), Text = "abc", Email = "123@abc"},
-        //        new Word {Id = Guid.NewGuid(), Text = "wsx", Email = "1234@abc"},
-        //        new Word {Id = Guid.NewGuid(), Text = "qaz", Email = "12345@abc"}
-        //    };
-
-        //    var context = new Mock<WordContext>();
-        //    var wordsRepository = new WordsRepository(context.Object);
-        //    //var wordsServices = new WordsServices(wordsRepository.Object);
-        //    context.Setup(repo => repo.Words = words);
-
-        //    var result = wordsRepository.WordOfTheDay();
-
-        //}
         [Fact]
         public void WordsOfTheDayTest()
         {
@@ -83,10 +32,6 @@ namespace WordOfTheDay.Tests
             }.AsQueryable();
 
             var set = new Mock<DbSet<Word>>();
-
-            //set.As<IDbAsyncEnumerable<Word>>()
-            //    .Setup(w=> GetAsyncEnumerator())
-            //    .Returns(new TestDbAsyncEnumerator<Word>(words.GetEnumerator()));
 
             set.As<IQueryable<Word>>().Setup(w => w.Provider).Returns(words.Provider);
             set.As<IQueryable<Word>>().Setup(w => w.Expression).Returns(words.Expression);
