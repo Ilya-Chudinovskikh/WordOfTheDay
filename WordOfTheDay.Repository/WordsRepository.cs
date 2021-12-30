@@ -9,7 +9,7 @@ using LinqKit;
 
 namespace WordOfTheDay.Repository
 {
-    internal sealed class WordsRepository : IWordsRepository
+    public class WordsRepository : IWordsRepository
     {
         private readonly WordContext _context;
         public WordsRepository(WordContext context)
@@ -18,8 +18,10 @@ namespace WordOfTheDay.Repository
         }
         public async Task<WordCount> WordOfTheDay()
         {
+            var time = DateTime.Today.ToUniversalTime();
+
             var wordOfTheDayType = await _context.Words
-                .Where(word=>word.AddTime > DateTime.Today.ToUniversalTime())
+                .Where(word=>word.AddTime > time)
                 .GroupBy(word => word.Text, (text, words) => new { text, words = words.Count(word => word.Text == text) })
                 .OrderByDescending(el => el.words).FirstOrDefaultAsync();
 
@@ -32,6 +34,8 @@ namespace WordOfTheDay.Repository
         }
         public async Task<List<WordCount>> CloseWords(string email)
         {
+            var time = DateTime.Today.ToUniversalTime();
+
             var word = (await UserWord(email)).Word;
 
             var keys = GetKeys(word);
@@ -44,7 +48,7 @@ namespace WordOfTheDay.Repository
                     closeWord => EF.Functions.Like(closeWord.Text, key) 
                     && closeWord.Text.Length <= word.Length + 1 
                     && closeWord.Text != word
-                    && closeWord.AddTime > DateTime.Today.ToUniversalTime());
+                    && closeWord.AddTime > time);
             }
 
             var closeWords = _context.Words
@@ -60,19 +64,23 @@ namespace WordOfTheDay.Repository
         }
         public Task<bool> IsAlreadyExist(Word word)
         {
+            var time = DateTime.Today.ToUniversalTime();
+
             var exist = _context.Words
-                .AnyAsync(w => w.Email == word.Email && w.AddTime > DateTime.Today.ToUniversalTime());
+                .AnyAsync(w => w.Email == word.Email && w.AddTime > time);
 
             return exist;
         }
         public async Task<WordCount> UserWord(string email)
         {
+            var time = DateTime.Today.ToUniversalTime();
+
             var word = await _context.Words
-                .Where(word => word.AddTime > DateTime.Today.ToUniversalTime())
+                .Where(word => word.AddTime > time)
                 .SingleOrDefaultAsync(w=>w.Email==email);
 
             var userWordAmount = await _context.Words
-                .Where(w => w.AddTime > DateTime.Today.ToUniversalTime() && w.Text == word.Text)
+                .Where(w => w.AddTime > time && w.Text == word.Text)
                 .CountAsync();
 
             var userWord = new WordCount(word.Text, userWordAmount);
