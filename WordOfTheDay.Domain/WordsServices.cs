@@ -8,7 +8,7 @@ using WordOfTheDay.Repository.Models;
 
 namespace WordOfTheDay.Domain
 {
-    public class WordsServices : IWordsServices
+    internal sealed class WordsServices : IWordsServices
     {
         private readonly IWordsRepository _wordsRepository;
         public WordsServices (IWordsRepository wordsRepository)
