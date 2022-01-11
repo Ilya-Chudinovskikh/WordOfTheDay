@@ -30,7 +30,7 @@ namespace WordOfTheDay.Repository.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Text")
                         .IsRequired()
@@ -39,8 +39,11 @@ namespace WordOfTheDay.Repository.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex(new[] { "Text" }, "Text_Index")
-                        .IsUnique();
+                    b.HasIndex("AddTime", "Email")
+                        .HasDatabaseName("DateEmail_Index");
+
+                    b.HasIndex("AddTime", "Text")
+                        .HasDatabaseName("DateText_Index");
 
                     b.ToTable("Words");
                 });

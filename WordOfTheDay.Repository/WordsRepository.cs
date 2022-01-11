@@ -9,51 +9,35 @@ using LinqKit;
 
 namespace WordOfTheDay.Repository
 {
-    public class WordsRepository : IWordsRepository
+    internal sealed class WordsRepository : IWordsRepository
     {
         private readonly WordContext _context;
         public WordsRepository(WordContext context)
         {
             _context = context;
         }
+        private static DateTime DateToday
+        {
+            get { return DateTime.Today.ToUniversalTime(); }
+        }
         public async Task<WordCount> WordOfTheDay()
         {
-            var time = DateTime.Today.ToUniversalTime();
-
-            var wordOfTheDayType = await _context.Words
-                .Where(word=>word.AddTime > time)
-                .GroupBy(word => word.Text, (text, words) => new { text, words = words.Count(word => word.Text == text) })
-                .OrderByDescending(el => el.words).FirstOrDefaultAsync();
-
-            if (wordOfTheDayType == null)
-                return null;
-
-            var wordOfTheDay = new WordCount(wordOfTheDayType.text, wordOfTheDayType.words);
+            var wordOfTheDay = await _context.Words
+                .LaterThan(DateToday)
+                .FindWordOfTheDay();
             
             return wordOfTheDay;
         }
         public async Task<List<WordCount>> CloseWords(string email)
         {
-            var time = DateTime.Today.ToUniversalTime();
-
             var word = (await UserWord(email)).Word;
 
             var keys = GetKeys(word);
 
-            var predicate = PredicateBuilder.New<Word>();
-
-            foreach (string key in keys)
-            {
-                predicate = predicate.Or(
-                    closeWord => EF.Functions.Like(closeWord.Text, key) 
-                    && closeWord.Text.Length <= word.Length + 1 
-                    && closeWord.Text != word
-                    && closeWord.AddTime > time);
-            }
-
             var closeWords = _context.Words
-                .AsExpandable().Where(predicate)
-                .GroupBy(word => word.Text, (text, words) => new WordCount(text, words.Count(word => word.Text == text)));
+                .AsExpandable().FilterClosestWords(keys, word)
+                .LaterThan(DateToday)
+                .GroupByWordCount();
 
             return await closeWords.ToListAsync();
         }
@@ -64,23 +48,23 @@ namespace WordOfTheDay.Repository
         }
         public Task<bool> IsAlreadyExist(Word word)
         {
-            var time = DateTime.Today.ToUniversalTime();
-
             var exist = _context.Words
-                .AnyAsync(w => w.Email == word.Email && w.AddTime > time);
+                .LaterThan(DateToday)
+                .ByEmail(word.Email)
+                .AnyAsync();
 
             return exist;
         }
         public async Task<WordCount> UserWord(string email)
         {
-            var time = DateTime.Today.ToUniversalTime();
-
             var word = await _context.Words
-                .Where(word => word.AddTime > time)
-                .SingleOrDefaultAsync(w=>w.Email==email);
+                .LaterThan(DateToday)
+                .ByEmail(email)
+                .SingleOrDefaultAsync();
 
             var userWordAmount = await _context.Words
-                .Where(w => w.AddTime > time && w.Text == word.Text)
+                .LaterThan(DateToday)
+                .ByText(word.Text)
                 .CountAsync();
 
             var userWord = new WordCount(word.Text, userWordAmount);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WordOfTheDay.Repository.Entities;
@@ -24,7 +25,7 @@ namespace WordOfTheDay.Domain
         
         public Task<List<WordCount>> CloseWords(string email)
         {
-            var closeWords = _wordsRepository.CloseWords(email);
+            var closeWords = _wordsRepository.CloseWords(email.ToLower());
 
             return closeWords;
         }
@@ -32,11 +33,14 @@ namespace WordOfTheDay.Domain
         {
             word.AddTime = DateTime.UtcNow;
 
+            word.Text = word.Text.ToLower();
+            word.Email = word.Email.ToLower();
+
             return _wordsRepository.PostWord(word);
         }
         public Task<WordCount> UserWord(string email)
         {
-            var userWord = _wordsRepository.UserWord(email);
+            var userWord = _wordsRepository.UserWord(email.ToLower());
 
             return userWord;
 
