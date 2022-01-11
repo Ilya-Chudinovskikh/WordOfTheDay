@@ -18,15 +18,16 @@ namespace WordOfTheDay.Tests
         {
             get
             {
+                int date = 11;
                 return new List<Word>
                 {
-                    new Word {Id = Guid.NewGuid(), Text = "abc", Email = "123@abc", AddTime = new DateTime(2022, 1, 10, 10, 10, 10) },
-                    new Word {Id = Guid.NewGuid(), Text = "wsx", Email = "1234@abc", AddTime = new DateTime(2022, 1, 10, 10, 10, 11)},
-                    new Word {Id = Guid.NewGuid(), Text = "qaz", Email = "12345@abc", AddTime = new DateTime(2022, 1, 10, 10, 10, 12)},
-                    new Word {Id = Guid.NewGuid(), Text = "abc", Email = "wsx@abc", AddTime = new DateTime(2022, 1, 10, 10, 10, 19)},
-                    new Word {Id = Guid.NewGuid(), Text = "qaz", Email = "qaz@abc", AddTime = new DateTime(2022, 1, 10, 10, 10, 20)},
-                    new Word {Id = Guid.NewGuid(), Text = "qaz", Email = "qwe@abc", AddTime = new DateTime(2022, 1, 10, 10, 09, 10)},
-                    new Word {Id = Guid.NewGuid(), Text = "ddd", Email = "asd@abc", AddTime = new DateTime(2022, 1, 10, 09, 10, 10)}
+                    new Word {Id = Guid.NewGuid(), Text = "abc", Email = "123@abc", AddTime = new DateTime(2022, 1, date, 10, 10, 10) },
+                    new Word {Id = Guid.NewGuid(), Text = "wsx", Email = "1234@abc", AddTime = new DateTime(2022, 1, date, 10, 10, 11)},
+                    new Word {Id = Guid.NewGuid(), Text = "qaz", Email = "12345@abc", AddTime = new DateTime(2022, 1, date, 10, 10, 12)},
+                    new Word {Id = Guid.NewGuid(), Text = "abc", Email = "wsx@abc", AddTime = new DateTime(2022, 1, date, 10, 10, 19)},
+                    new Word {Id = Guid.NewGuid(), Text = "qaz", Email = "qaz@abc", AddTime = new DateTime(2022, 1, date, 10, 10, 20)},
+                    new Word {Id = Guid.NewGuid(), Text = "qaz", Email = "qwe@abc", AddTime = new DateTime(2022, 1, date, 10, 09, 10)},
+                    new Word {Id = Guid.NewGuid(), Text = "ddd", Email = "asd@abc", AddTime = new DateTime(2022, 1, date, 09, 10, 10)}
                 };
             }
         }

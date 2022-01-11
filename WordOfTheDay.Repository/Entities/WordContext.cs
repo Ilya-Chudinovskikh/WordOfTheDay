@@ -16,7 +16,8 @@ namespace WordOfTheDay.Repository.Entities
         {
             modelBuilder.Entity<Word>()
                 .HasIndex(w => new { w.AddTime, w.Email })
-                .HasDatabaseName("DateEmail_Index");
+                .HasDatabaseName("DateEmail_Index")
+                .IsUnique();
 
             modelBuilder.Entity<Word>()
                 .HasIndex(w => new { w.AddTime, w.Text })
