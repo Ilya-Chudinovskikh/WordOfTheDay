@@ -12,7 +12,7 @@ namespace WordOfTheDay.Domain
 
         Task<List<WordCount>> CloseWords(string word);
 
-        Task PostWord(Word word);
+        Task<Task> PostWord(Word word);
 
         Task<WordCount> UserWord(string email);
 

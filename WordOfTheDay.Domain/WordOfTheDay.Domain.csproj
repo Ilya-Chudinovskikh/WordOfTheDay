@@ -17,5 +17,9 @@
 	  <_Parameter1>DynamicProxyGenAssembly2</_Parameter1>
 	</AssemblyAttribute>
   </ItemGroup>
+	
+  <ItemGroup>
+    <PackageReference Include="FreeGeoIPCore" Version="1.0.3" />
+  </ItemGroup>
 
 </Project>
