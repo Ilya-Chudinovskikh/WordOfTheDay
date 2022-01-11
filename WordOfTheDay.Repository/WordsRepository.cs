@@ -50,7 +50,8 @@ namespace WordOfTheDay.Repository
         {
             var exist = _context.Words
                 .LaterThan(DateToday)
-                .AnyAsync(w => w.Email == word.Email);
+                .ByEmail(word.Email)
+                .AnyAsync();
 
             return exist;
         }
@@ -58,11 +59,12 @@ namespace WordOfTheDay.Repository
         {
             var word = await _context.Words
                 .LaterThan(DateToday)
-                .SingleOrDefaultAsync(w=>w.Email==email);
+                .ByEmail(email)
+                .SingleOrDefaultAsync();
 
             var userWordAmount = await _context.Words
                 .LaterThan(DateToday)
-                .Where(w => w.Text == word.Text)
+                .ByText(word.Text)
                 .CountAsync();
 
             var userWord = new WordCount(word.Text, userWordAmount);
