@@ -22,13 +22,19 @@ namespace WordOfTheDay.Repository
         }
         public async Task<WordCount> WordOfTheDay()
         {
+
             var wordOfTheDay = await _context.Words
                 .LaterThan(DateToday)
-                .FindWordOfTheDay();
-            
+                .GroupBy(word => word.Text, (text, words) => new WordCount { Word = text, Count = words.Count(word => word.Text == text) })
+                .OrderByDescending(w => w.Count)
+                .FirstOrDefaultAsync();
+
+            if (wordOfTheDay == null)
+                return null;
+
             return wordOfTheDay;
         }
-        public async Task<List<WordCount>> CloseWords(string email)
+        public async Task<IEnumerable<WordCount>> CloseWords(string email)
         {
             var word = (await UserWord(email)).Word;
 
@@ -39,7 +45,7 @@ namespace WordOfTheDay.Repository
                 .LaterThan(DateToday)
                 .GroupByWordCount();
 
-            return await closeWords.ToListAsync();
+            return closeWords;
         }
         public async Task PostWord(Word word)
         {

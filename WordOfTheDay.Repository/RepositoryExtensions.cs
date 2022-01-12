@@ -5,7 +5,6 @@ using WordOfTheDay.Repository.Entities;
 using WordOfTheDay.Repository.Models;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
 namespace WordOfTheDay.Repository
 {
@@ -13,7 +12,7 @@ namespace WordOfTheDay.Repository
     {
         public static IQueryable<Word> LaterThan(this IQueryable<Word> query, DateTime today)
         {
-            query = query.Where(word => word.AddTime > today);
+            query = query.Where(word => word.AddTime >= today);
 
             return query;
         }
@@ -44,20 +43,6 @@ namespace WordOfTheDay.Repository
             query = query.Where(predicate);
 
             return query;
-        }
-        public static async Task<WordCount> FindWordOfTheDay(this IQueryable<Word> query)
-        {
-            var result = await query.GroupBy(word => word.Text, (text, amount) => new { text, amount = amount.Count(word => word.Text == text)})
-                .OrderByDescending(w => w.amount).FirstOrDefaultAsync();
-
-            var wordOfTheDay = new WordCount(null, 0);
-
-            if (result != null)
-                wordOfTheDay = new WordCount(result.text, result.amount);
-            else
-                return null;
-
-            return wordOfTheDay;
         }
         public static IQueryable<WordCount> GroupByWordCount(this IQueryable<Word> query)
         {

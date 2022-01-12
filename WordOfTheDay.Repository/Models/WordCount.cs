@@ -5,6 +5,7 @@ namespace WordOfTheDay.Repository.Models
     {
         public string Word { get; set; }
         public int Count { get; set; }
+        public WordCount() { }
         public WordCount(string word, int count)
         {
             Word = word;

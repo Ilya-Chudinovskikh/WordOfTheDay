@@ -9,7 +9,7 @@ namespace WordOfTheDay.Repository
     {
         Task<WordCount> WordOfTheDay();
 
-        Task<List<WordCount>> CloseWords(string word);
+        Task<IEnumerable<WordCount>> CloseWords(string word);
 
         Task PostWord(Word word);
 
