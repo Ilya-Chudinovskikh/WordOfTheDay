@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WordOfTheDay.Repository.Entities;
 
 namespace WordOfTheDay.Repository.Migrations
 {
     [DbContext(typeof(WordContext))]
-    partial class WordContextModelSnapshot : ModelSnapshot
+    [Migration("20220113134438_IdentityAuthentication")]
+    partial class IdentityAuthentication
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
