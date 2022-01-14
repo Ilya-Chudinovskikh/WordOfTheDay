@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using WordOfTheDay.Repository.Entities;
 using WordOfTheDay.Domain;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WordOfTheDay.Api.Controllers
 {

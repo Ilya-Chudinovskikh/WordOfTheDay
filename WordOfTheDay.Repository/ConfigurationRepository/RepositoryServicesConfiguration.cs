@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using WordOfTheDay.Repository.Entities;
 
-namespace WordOfTheDay.Repository
+namespace WordOfTheDay.Repository.Configuration
 {
     public static class RepositoryServicesConfiguration
     {
