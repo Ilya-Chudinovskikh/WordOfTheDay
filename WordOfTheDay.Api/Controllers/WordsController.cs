@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using WordOfTheDay.Repository.Entities;
 using WordOfTheDay.Domain;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace WordOfTheDay.Api.Controllers
 {
     [Route("api/words")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class WordsController : ControllerBase
     {
         private readonly IWordsServices _wordsServices;
