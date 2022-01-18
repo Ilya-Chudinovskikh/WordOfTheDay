@@ -16,5 +16,7 @@ namespace WordOfTheDay.Repository.Entities
         public string Text { get; set; }
         [Required]
         public DateTime AddTime { get; set; }
+        public double LocationLongitude { get; set; }
+        public double LocationLatitude { get; set; }
     }
 }

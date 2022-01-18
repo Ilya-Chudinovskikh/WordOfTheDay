@@ -31,7 +31,7 @@ namespace WordOfTheDay.Domain
         }
         public Task PostWord(Word word)
         {
-            word.AddTime = DateTime.UtcNow;
+            word.AddTime = DateTime.Today.ToUniversalTime();
 
             word.Text = word.Text.ToLower();
             word.Email = word.Email.ToLower();
