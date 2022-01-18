@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using WordOfTheDay.Repository.Entities;
 using WordOfTheDay.Repository.Models;
 using LinqKit;
+using System.Diagnostics;
 
 namespace WordOfTheDay.Repository
 {
@@ -22,10 +23,9 @@ namespace WordOfTheDay.Repository
         }
         public async Task<WordCount> WordOfTheDay()
         {
-
             var wordOfTheDay = await _context.Words
                 .LaterThan(DateToday)
-                .GroupBy(word => word.Text, (text, words) => new WordCount { Word = text, Count = words.Count(word => word.Text == text) })
+                .GroupByWordCount()
                 .OrderByDescending(w => w.Count)
                 .FirstOrDefaultAsync();
 
@@ -73,7 +73,7 @@ namespace WordOfTheDay.Repository
                 .ByText(word.Text)
                 .CountAsync();
 
-            var userWord = new WordCount(word.Text, userWordAmount);
+            var userWord = new WordCount { Word = word.Text, Count = userWordAmount };
 
             return userWord;
         }

@@ -46,7 +46,7 @@ namespace WordOfTheDay.Repository
         }
         public static IQueryable<WordCount> GroupByWordCount(this IQueryable<Word> query)
         {
-            var result = query.GroupBy(word => word.Text, (text, words) => new WordCount(text, words.Count(word => word.Text == text)));
+            var result = query.GroupBy(word => word.Text, (text, words) => new WordCount { Word = text, Count = words.Count(word => word.Text == text) });
 
             return result;
         }
