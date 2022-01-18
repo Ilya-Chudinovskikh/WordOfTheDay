@@ -5,10 +5,6 @@ using System.Threading.Tasks;
 using WordOfTheDay.Repository.Entities;
 using WordOfTheDay.Repository;
 using WordOfTheDay.Repository.Models;
-using FreeGeoIPCore;
-using Microsoft.AspNetCore.Http;
-using FreeGeoIPCore.AppCode;
-using Microsoft.Extensions.Primitives;
 
 namespace WordOfTheDay.Domain
 {
@@ -27,7 +23,7 @@ namespace WordOfTheDay.Domain
             return wordOfTheDay;
         }
         
-        public Task<IEnumerable<WordCount>> CloseWords(string email)
+        public Task<List<WordCount>> CloseWords(string email)
         {
             var closeWords = _wordsRepository.CloseWords(email.ToLower());
 

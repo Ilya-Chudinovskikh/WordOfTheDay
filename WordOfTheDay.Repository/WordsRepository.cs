@@ -34,7 +34,7 @@ namespace WordOfTheDay.Repository
 
             return wordOfTheDay;
         }
-        public async Task<IEnumerable<WordCount>> CloseWords(string email)
+        public async Task<List<WordCount>> CloseWords(string email)
         {
             var word = (await UserWord(email)).Word;
 
@@ -45,7 +45,7 @@ namespace WordOfTheDay.Repository
                 .LaterThan(DateToday)
                 .GroupByWordCount();
 
-            return closeWords;
+            return closeWords.ToList();
         }
         public async Task PostWord(Word word)
         {
