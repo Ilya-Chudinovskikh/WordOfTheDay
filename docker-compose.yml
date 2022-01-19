@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  wordoftheday.api:
+    image: ${DOCKER_REGISTRY-}wordofthedayapi
+    build:
+      context: .
+      dockerfile: WordOfTheDay.Api/Dockerfile
