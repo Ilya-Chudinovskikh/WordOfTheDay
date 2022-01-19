@@ -1,0 +1,16 @@
+version: '3.9'
+services:
+  mssql-server:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "123456"
+      MSSQL_PID: Express
+    ports:
+      - "1433:1433"
+  wordofthedayapp:
+    build:
+      dockerfile: ./Dockerfile
+    ports:
+      - "5001:80"
+
