@@ -10,7 +10,7 @@ COPY WordOfTheDay.Domain/*.csproj ./WordOfTheDay.Domain/
 COPY WordOfTheDay.Repository/*.csproj ./WordOfTheDay.Repository/
 RUN dotnet restore "WordOfTheDay.Api/WordOfTheDay.Api.csproj"
 COPY . .
-WORKDIR "/src/WordOfTheDay.Api"
+WORKDIR /src/WordOfTheDay.Api
 RUN dotnet build "WordOfTheDay.Api.csproj" -c Release -o /app/build
 
 FROM build AS publish
