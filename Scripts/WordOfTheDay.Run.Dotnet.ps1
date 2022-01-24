@@ -1,4 +1,4 @@
 ﻿cd C:\Users\Илья\source\repos\WordOfTheDayApp
 dotnet build
-cd C:\Users\Илья\source\repos\WordOfTheDayApp\WordOfTheDay.Api
+cd WordOfTheDay.Api
 dotnet run 

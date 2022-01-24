@@ -9,9 +9,11 @@ services:
     ports:
       - 1433:1433
     volumes:
-      - //c/Users/Илья/WordContext-03daec14-a505-48b7-8fb2-72bc85eb0fcd
+      - "app-db:/var/opt/mssql/data"
   wordofthedayapp:
     build:
       dockerfile: WordOfTheDay.Api/Dockerfile
     ports:
       - 5001:80
+volumes:
+  app-db:
