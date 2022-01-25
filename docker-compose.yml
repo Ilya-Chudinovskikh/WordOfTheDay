@@ -2,6 +2,7 @@ version: '3.9'
 services:
   ms-sql-server:
     image: mcr.microsoft.com/mssql/server:2019-latest
+    user: root
     environment:
       ACCEPT_EULA: "Y"
       SA_PASSWORD: "Password123!"
@@ -13,6 +14,7 @@ services:
   wordofthedayapp:
     build:
       dockerfile: WordOfTheDay.Api/Dockerfile
+    image: wordofthedayapp
     ports:
       - 5001:80
 volumes:
