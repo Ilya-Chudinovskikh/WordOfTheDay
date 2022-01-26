@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using WordOfTheDay.Repository.Entities;
 using System;
+using MassTransit;
 
 namespace WordOfTheDay.Repository
 {
@@ -14,6 +14,18 @@ namespace WordOfTheDay.Repository
                     options.UseSqlServer(connectionString).LogTo(Console.WriteLine));
 
             services.AddScoped<IWordsRepository, WordsRepository>();
+        }
+        public static void AddConfiguredMassTransit(this IServiceCollection services, string host)
+        {
+            services.AddMassTransit(Configuration =>
+            {
+                Configuration.UsingRabbitMq((context, config) =>
+                {
+                    config.Host(host);
+                });
+            });
+
+            services.AddMassTransitHostedService();
         }
     }
 }

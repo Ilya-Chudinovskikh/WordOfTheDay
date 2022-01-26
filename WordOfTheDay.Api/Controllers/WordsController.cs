@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using WordOfTheDay.Repository.Entities;
 using WordOfTheDay.Domain;
+using MassTransit;
 
 namespace WordOfTheDay.Api.Controllers
 {
@@ -10,9 +11,11 @@ namespace WordOfTheDay.Api.Controllers
     public class WordsController : ControllerBase
     {
         private readonly IWordsServices _wordsServices;
-        public WordsController(IWordsServices wordsServices)
+        private readonly IPublishEndpoint _publishEndpoint;
+        public WordsController(IWordsServices wordsServices, IPublishEndpoint publishEndpoint)
         {
             _wordsServices = wordsServices;
+            _publishEndpoint = publishEndpoint;
         }
 
         [HttpGet("get-word-of-the-day")]
@@ -59,6 +62,8 @@ namespace WordOfTheDay.Api.Controllers
                 return BadRequest(ModelState);
 
             await _wordsServices.PostWord(word);
+
+            await _publishEndpoint.Publish<Word>(word);
 
             return Ok(word);
         }
