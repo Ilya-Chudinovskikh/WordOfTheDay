@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using WordOfTheDay.Repository.Entities;
 using WordOfTheDay.Domain;
 using MassTransit;
+using SharedModelsLibrary;
 
 namespace WordOfTheDay.Api.Controllers
 {
@@ -63,7 +64,7 @@ namespace WordOfTheDay.Api.Controllers
 
             await _wordsServices.PostWord(word);
 
-            await _publishEndpoint.Publish<Word>(word);
+            await _publishEndpoint.Publish(new WordInfo(word.Email, word.Text, word.AddTime, word.LocationLongitude, word.LocationLatitude));
 
             return Ok(word);
         }

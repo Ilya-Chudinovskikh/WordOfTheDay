@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WordOfTheDay.Domain\WordOfTheDay.Domain.csproj" />
+	<ProjectReference Include="..\SharedModelsLibrary\SharedModelsLibrary.csproj" />
   </ItemGroup>
 
 	<ItemGroup>
