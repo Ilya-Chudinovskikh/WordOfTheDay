@@ -64,7 +64,7 @@ namespace WordOfTheDay.Api.Controllers
 
             await _wordsServices.PostWord(word);
 
-            await _publishEndpoint.Publish(new WordInfo(word.Email, word.Text, word.AddTime, word.LocationLongitude, word.LocationLatitude));
+            await _publishEndpoint.Publish(new WordInfo(word.Id, word.Email, word.Text, word.AddTime, word.LocationLongitude, word.LocationLatitude));
 
             return Ok(word);
         }
