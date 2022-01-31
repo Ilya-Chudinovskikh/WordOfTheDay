@@ -12,11 +12,9 @@ namespace WordOfTheDay.Api.Controllers
     public class WordsController : ControllerBase
     {
         private readonly IWordsServices _wordsServices;
-        private readonly IPublishEndpoint _publishEndpoint;
-        public WordsController(IWordsServices wordsServices, IPublishEndpoint publishEndpoint)
+        public WordsController(IWordsServices wordsServices)
         {
             _wordsServices = wordsServices;
-            _publishEndpoint = publishEndpoint;
         }
 
         [HttpGet("get-word-of-the-day")]
@@ -63,8 +61,6 @@ namespace WordOfTheDay.Api.Controllers
                 return BadRequest(ModelState);
 
             await _wordsServices.PostWord(word);
-
-            await _publishEndpoint.Publish(new WordInfo(word.Id, word.Email, word.Text, word.AddTime, word.LocationLongitude, word.LocationLatitude));
 
             return Ok(word);
         }

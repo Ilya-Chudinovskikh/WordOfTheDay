@@ -15,17 +15,5 @@ namespace WordOfTheDay.Repository
 
             services.AddScoped<IWordsRepository, WordsRepository>();
         }
-        public static void AddConfiguredMassTransit(this IServiceCollection services, string host)
-        {
-            services.AddMassTransit(Configuration =>
-            {
-                Configuration.UsingRabbitMq((context, config) =>
-                {
-                    config.Host(host);
-                });
-            });
-
-            services.AddMassTransitHostedService();
-        }
     }
 }

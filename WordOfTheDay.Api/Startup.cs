@@ -26,7 +26,7 @@ namespace WordOfTheDay
             services.AddRepositories(Configuration.GetConnectionString("WordContext"));
             services.AddDomain();
 
-            services.AddConfiguredMassTransit("amqp://guest:guest@localhost:5672");
+            services.AddConfiguredMassTransit(Configuration.GetConnectionString("RabbitMQHost"));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -49,8 +49,6 @@ namespace WordOfTheDay
             {
                 endpoints.MapControllers();
             });
-
-
         }
     }
 }
