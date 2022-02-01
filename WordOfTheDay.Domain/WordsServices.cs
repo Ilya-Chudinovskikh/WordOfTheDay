@@ -32,16 +32,18 @@ namespace WordOfTheDay.Domain
 
             return closeWords;
         }
-        public async Task<Task> PostWord(Word word)
+        public async Task<Word> PostWord(Word word)
         {
             word.AddTime = DateTime.Today.ToUniversalTime();
 
             word.Text = word.Text.ToLower();
             word.Email = word.Email.ToLower();
 
+            await _wordsRepository.PostWord(word);
+
             await _publishEndpoint.Publish(new WordInfo(word.Id, word.Email, word.Text, word.AddTime, word.LocationLongitude, word.LocationLatitude));
 
-            return _wordsRepository.PostWord(word);
+            return word;
         }
         public Task<WordCount> UserWord(string email)
         {

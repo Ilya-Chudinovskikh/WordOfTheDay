@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WordOfTheDay.Repository.Models;
 
 namespace WordOfTheDay.Repository.Entities
 {

@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using WordOfTheDay.Repository.Entities;
 using WordOfTheDay.Domain;
-using MassTransit;
-using SharedModelsLibrary;
 
 namespace WordOfTheDay.Api.Controllers
 {

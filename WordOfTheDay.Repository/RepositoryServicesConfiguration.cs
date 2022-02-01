@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using WordOfTheDay.Repository.Entities;
 using System;
-using MassTransit;
 
 namespace WordOfTheDay.Repository
 {

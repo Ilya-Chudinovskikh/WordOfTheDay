@@ -12,7 +12,10 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
+    networks:
+      - app-network
   ms-sql-server:
+    container_name: ms-sql-server
     image: mcr.microsoft.com/mssql/server:2019-latest
     user: root
     environment:
@@ -21,13 +24,27 @@ services:
       MSSQL_PID: Express
     ports:
       - 1433:1433
+    networks:
+      - app-network
     volumes:
       - "app-db:/var/opt/mssql/data"
   wordofthedayapp:
     build:
       dockerfile: WordOfTheDay.Api/Dockerfile
     image: wordofthedayapp
+    depends_on:
+      - ms-sql-server
+    networks:
+      - app-network
+    environment:
+      DbServer: "ms-sql-server"
+      DbPort: "1433"
+      DbUser: "sa"
+      Password: "Password123!"
+      Database: "app-db"
     ports:
       - 5001:80
 volumes:
   app-db:
+networks:
+  app-network:
