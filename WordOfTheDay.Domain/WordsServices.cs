@@ -39,9 +39,7 @@ namespace WordOfTheDay.Domain
             word.Text = word.Text.ToLower();
             word.Email = word.Email.ToLower();
 
-            await _wordsRepository.PostWord(word);
-
-            await _publishEndpoint.Publish(new WordInfo(word.Id, word.Email, word.Text, word.AddTime, word.LocationLongitude, word.LocationLatitude));
+            await PostAndPublishWord(word);
 
             return word;
         }
@@ -57,6 +55,12 @@ namespace WordOfTheDay.Domain
             var exist = _wordsRepository.IsAlreadyExist(word);
 
             return exist;
+        }
+        public async Task PostAndPublishWord(Word word)
+        {
+            _wordsRepository.PostWord(word);
+
+            await _publishEndpoint.Publish(new WordInfo(word.Id, word.Email, word.Text, word.AddTime, word.LocationLongitude, word.LocationLatitude));
         }
     }
 }

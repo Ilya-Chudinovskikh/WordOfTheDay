@@ -18,5 +18,6 @@ namespace WordOfTheDay.Domain
 
         Task<bool> IsAlreadyExist(Word word);
 
+        Task PostAndPublishWord(Word word);
     }
 }
