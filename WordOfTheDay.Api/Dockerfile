@@ -8,6 +8,7 @@ WORKDIR /src
 COPY WordOfTheDay.Api/*.csproj ./WordOfTheDay.Api/
 COPY WordOfTheDay.Domain/*.csproj ./WordOfTheDay.Domain/
 COPY WordOfTheDay.Repository/*.csproj ./WordOfTheDay.Repository/
+COPY SharedModelsLibrary/*.csproj ./SharedModelsLibrary/
 RUN dotnet restore "WordOfTheDay.Api/WordOfTheDay.Api.csproj"
 COPY . .
 WORKDIR /src/WordOfTheDay.Api

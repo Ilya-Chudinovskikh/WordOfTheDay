@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SharedModelsLibrary\SharedModelsLibrary.csproj" />
     <ProjectReference Include="..\WordOfTheDay.Repository\WordOfTheDay.Repository.csproj" />
   </ItemGroup>
 	
@@ -16,6 +17,13 @@
 	<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
 	  <_Parameter1>DynamicProxyGenAssembly2</_Parameter1>
 	</AssemblyAttribute>
+  </ItemGroup>
+	
+  <ItemGroup>
+    <PackageReference Include="MassTransit" Version="7.3.1" />
+    <PackageReference Include="MassTransit.AspNetCore" Version="7.3.1" />
+    <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.3.1" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="7.3.1" />
   </ItemGroup>
 
 </Project>

@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
-using WordOfTheDay.Repository.Entities;
 using WordOfTheDay.Repository;
 using WordOfTheDay.Domain;
 
@@ -26,6 +25,8 @@ namespace WordOfTheDay
 
             services.AddRepositories(Configuration.GetConnectionString("WordContext"));
             services.AddDomain();
+
+            services.AddConfiguredMassTransit(Configuration.GetConnectionString("RabbitMQHost"));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

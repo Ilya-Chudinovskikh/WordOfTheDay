@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using WordOfTheDay.Repository.Entities;
 using WordOfTheDay.Repository.Models;
 using LinqKit;
-using System.Diagnostics;
 
 namespace WordOfTheDay.Repository
 {

@@ -12,11 +12,12 @@ namespace WordOfTheDay.Domain
 
         Task<List<WordCount>> CloseWords(string word);
 
-        Task PostWord(Word word);
+        Task<Word> PostWord(Word word);
 
         Task<WordCount> UserWord(string email);
 
         Task<bool> IsAlreadyExist(Word word);
 
+        Task PostAndPublishWord(Word word);
     }
 }
