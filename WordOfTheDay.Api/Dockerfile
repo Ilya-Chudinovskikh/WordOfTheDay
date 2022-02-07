@@ -5,13 +5,12 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
-COPY WordOfTheDay.Api/*.csproj ./WordOfTheDay.Api/
-COPY WordOfTheDay.Domain/*.csproj ./WordOfTheDay.Domain/
-COPY WordOfTheDay.Repository/*.csproj ./WordOfTheDay.Repository/
-COPY SharedModelsLibrary/*.csproj ./SharedModelsLibrary/
+COPY ["WordOfTheDay.Api/WordOfTheDay.Api.csproj", "WordOfTheDay.Api/"]
+COPY ["WordOfTheDay.Domain/WordOfTheDay.Domain.csproj", "WordOfTheDay.Domain/"]
+COPY ["WordOfTheDay.Repository/WordOfTheDay.Repository.csproj", "WordOfTheDay.Repository/"]
 RUN dotnet restore "WordOfTheDay.Api/WordOfTheDay.Api.csproj"
 COPY . .
-WORKDIR /src/WordOfTheDay.Api
+WORKDIR "/src/WordOfTheDay.Api"
 RUN dotnet build "WordOfTheDay.Api.csproj" -c Release -o /app/build
 
 FROM build AS publish
