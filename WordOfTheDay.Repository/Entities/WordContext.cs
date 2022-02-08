@@ -7,6 +7,7 @@ namespace WordOfTheDay.Repository.Entities
         public WordContext (DbContextOptions<WordContext> options)
             : base(options)
         {
+            Database.EnsureCreated();
         }
         public virtual DbSet<Word> Words { get; set; }
         public WordContext()
