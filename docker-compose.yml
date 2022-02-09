@@ -53,7 +53,8 @@ services:
       Password: "Password123!"
       Database: "appdb"
     ports:
-      - 5001:80
+      - 5000:80
+      - 5001:443
     restart: on-failure
     depends_on:
       - rabbitmq
