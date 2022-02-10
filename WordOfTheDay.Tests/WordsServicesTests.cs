@@ -4,6 +4,7 @@ using Moq;
 using WordOfTheDay.Domain;
 using WordOfTheDay.Repository.Entities;
 using WordOfTheDay.Repository;
+using MassTransit;
 
 namespace WordOfTheDay.Tests
 {
@@ -16,13 +17,27 @@ namespace WordOfTheDay.Tests
 
             var wordsRepository = new Mock<IWordsRepository>();
 
-            var wordsSevices = new WordsServices(wordsRepository.Object);
+            var publishEndpoint = new Mock<IPublishEndpoint>();
+
+            var wordsSevices = new WordsServices(wordsRepository.Object, publishEndpoint.Object);
 
             await wordsSevices.PostWord(word);
 
             Assert.NotNull(word.AddTime);
+            Assert.NotEqual(0, word.LocationLongitude);
+            Assert.NotEqual(0, word.LocationLatitude);
             Assert.Equal("ddd", word.Text);
             Assert.Equal("asd@abc", word.Email);
+        }
+        [Fact]
+        public void MockLocation_Test()
+        {
+            var location = WordsServices.MockLocation();
+            var longtitude = location.longtitude;
+            var latitude = location.latitude;
+
+            Assert.InRange(longtitude, -180, 180);
+            Assert.InRange(latitude, -90, 90);
         }
     }
 }
