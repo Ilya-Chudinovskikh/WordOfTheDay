@@ -34,7 +34,11 @@ namespace WordOfTheDay.Domain
         }
         public async Task<Word> PostWord(Word word)
         {
+            var (longtitude, latitude) = MockLocation();
+
             word.AddTime = DateTime.Today.ToUniversalTime();
+            word.LocationLongitude = longtitude;
+            word.LocationLatitude = latitude;
 
             word.Text = word.Text.ToLower();
             word.Email = word.Email.ToLower();
@@ -61,6 +65,25 @@ namespace WordOfTheDay.Domain
             _wordsRepository.PostWord(word);
 
             await _publishEndpoint.Publish(new WordInfo(word.Id, word.Email, word.Text, word.AddTime, word.LocationLongitude, word.LocationLatitude));
+        }
+        public static (double longtitude, double latitude) MockLocation()
+        {
+            var longtitude = RandomCoordinate(180);
+            var latitude = RandomCoordinate(90);
+
+            var location = (longtitude, latitude);
+
+            return location;
+        }
+        public static double RandomCoordinate(int degree)
+        {
+            var random = new Random();
+            var intCoordinate = random.Next(-degree, degree);
+            var doubleCoordinate = Math.Round(random.NextDouble(), 5);
+
+            var coordinate = intCoordinate + doubleCoordinate;
+
+            return coordinate;
         }
     }
 }

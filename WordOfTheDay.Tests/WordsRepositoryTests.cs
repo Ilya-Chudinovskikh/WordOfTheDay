@@ -2,13 +2,10 @@ using System;
 using Xunit;
 using Moq;
 using WordOfTheDay.Repository;
-using WordOfTheDay.Api.Controllers;
-using WordOfTheDay.Domain;
 using System.Collections.Generic;
 using WordOfTheDay.Repository.Entities;
 using System.Linq;
 using MockQueryable.Moq;
-using Microsoft.AspNetCore.Mvc;
 
 namespace WordOfTheDay.Tests
 {
