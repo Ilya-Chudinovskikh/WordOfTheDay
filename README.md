@@ -14,8 +14,12 @@ Business requirements for the main part of application:
 3)	when the user clicks on “Tell the whole world!” he sees:
 
     •	word of the day (starting from 00:00 UTC up till now)
+    
     •	number of people who wrote the word of the day
+    
     •	his word if it doesn’t match the word of the day
+    
     •	number of people who wrote his word
+    
     •	statistics of closest words (with one letter difference)
         ex: User’s word: life, words shown in statistics: lite, lif, live, wife etc.
