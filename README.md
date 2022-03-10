@@ -11,7 +11,7 @@ Business requirements for the main part of application:
 	
 2)	word must be written in english without spaces and special characters, max 50 symbols
 	
-3)	when the user clicks on “Tell the whole world!” he sees:
+3)	user should be allowed to see:
 
     •	word of the day (starting from 00:00 UTC up till now)
     
